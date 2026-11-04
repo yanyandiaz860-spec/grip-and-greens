@@ -1,0 +1,171 @@
+---
+import SectionHead from '../SectionHead.astro';
+import LogoArt from '../LogoArt.astro';
+import ArtImage from '../ArtImage.astro';
+import Palette from '../Palette.astro';
+import TypeSpecs from '../TypeSpecs.astro';
+import { art } from '@/data/media';
+import { logoPalette, logoType } from '@/data/brand';
+
+const processKeys = ['process.01', 'process.02', 'process.03', 'process.04'] as const;
+
+/* Symbol meanings — taken from the annotations on the team's own process sheets */
+const symbols = [
+  { name: 'Scale dial', meaning: 'Progress, measurement and accountability.' },
+  { name: 'Leaf', meaning: 'Nutrition, freshness and healthy living.' },
+  { name: 'Lowercase g', meaning: 'Strength, movement and balance.' },
+];
+---
+<section id="logo" class="section surface-white logo-sec" aria-labelledby="logo-title">
+  <div class="container container--wide">
+    <SectionHead num="08" label="Logo Design" title="From pencil sketch <span class='accent'>to final mark</span>" id="logo-title">
+      <p class="lead">
+        The mark joins a lowercase g, a scale dial and a leaf into one symbol — training, progress and
+        nutrition working together.
+      </p>
+    </SectionHead>
+
+    <!-- Final logos (original files) -->
+    <div class="logos" data-stagger="scale">
+      <figure class="artboard artboard--primary marks">
+        <div class="artboard__art artboard__art--primary">
+          <LogoArt logo="logo.primary" size="min(620px, 80vw)" />
+        </div>
+        <figcaption><span>Primary logo</span> Horizontal lockup</figcaption>
+      </figure>
+      <figure class="artboard">
+        <div class="artboard__art artboard__art--secondary">
+          <LogoArt logo="logo.secondary" size="min(300px, 70vw)" />
+        </div>
+        <figcaption><span>Secondary logo</span> Wide mark, stacked wordmark</figcaption>
+      </figure>
+      <figure class="artboard">
+        <div class="artboard__art artboard__art--icon">
+          <LogoArt logo="logo.icon" size="min(130px, 36vw)" />
+        </div>
+        <figcaption><span>Icon-only logo</span> App, favicon &amp; small spaces</figcaption>
+      </figure>
+    </div>
+
+    <ul class="symbols" data-stagger="120" aria-label="What the symbol means">
+      {symbols.map((s) => (
+        <li><p class="symbols__name">{s.name}</p><p class="symbols__meaning">{s.meaning}</p></li>
+      ))}
+    </ul>
+
+    <!-- Logo process 01 → 04 -->
+    <div class="sub-head">
+      <h3>Logo process</h3>
+      <p>Four concept sheets, in order. Select a sheet to view it larger.</p>
+    </div>
+    <ol class="process" data-stagger="130">
+      {processKeys.map((k, i) => (
+        <li class="process__item">
+          <ArtImage art={k} group="logo-process" sizes="(min-width: 1180px) 600px, (min-width: 768px) 46vw, 92vw" />
+          <p class="process__cap">
+            <span class="process__num">0{i + 1}</span>
+            {art[k].title.replace(/^0\d · /, '')}
+          </p>
+        </li>
+      ))}
+    </ol>
+
+    <!-- Palette + typography -->
+    <div class="specs">
+      <Palette title="Logo color palette" swatches={logoPalette} cols={3} />
+      <TypeSpecs title="Logo typography" specs={logoType} />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Final logos */
+  .logos {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) {
+    .logos { grid-template-columns: 1fr 1fr; }
+    .artboard--primary { grid-column: 1 / -1; }
+  }
+  .artboard {
+    margin: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .artboard__art {
+    display: grid;
+    place-items: center;
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 3rem);
+    min-height: 220px;
+    background-image:
+      linear-gradient(rgb(46 125 50 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(46 125 50 / 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center;
+  }
+  .artboard__art :global(.logo-art) { box-shadow: 0 0 0 14px #fff; }
+  .artboard__art--primary :global(.logo-art) { width: min(620px, 100%); }
+  .artboard__art--secondary :global(.logo-art) { width: min(300px, 80%); }
+  .artboard__art--icon :global(.logo-art) { width: min(130px, 40%); }
+  .artboard figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding: 0.9rem 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    color: var(--t-muted);
+  }
+  .artboard figcaption span { font-weight: 800; color: var(--c-ink); }
+
+  /* Symbol meanings */
+  .symbols {
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 768px) { .symbols { grid-template-columns: repeat(3, 1fr); } }
+  .symbols li { padding-left: 1rem; border-left: 3px solid var(--c-green); }
+  .symbols__name { margin: 0; font-family: var(--font-display); font-size: 1.6rem; line-height: 1.1; color: var(--c-ink); }
+  .symbols__meaning { margin: 0.2rem 0 0; font-size: var(--fs-sm); color: var(--t-muted); }
+
+  /* Process */
+  .process {
+    list-style: none;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2.5vw, 2rem);
+  }
+  @media (min-width: 768px) { .process { grid-template-columns: 1fr 1fr; } }
+  .process__cap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin: var(--space-4) 0 0;
+    font-weight: 700;
+    color: var(--c-ink);
+  }
+  .process__num {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--c-green);
+  }
+
+  /* Specs */
+  .specs {
+    display: grid;
+    gap: var(--space-7);
+    margin-top: clamp(3.5rem, 6vw, 5rem);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 1024px) { .specs { grid-template-columns: 1.3fr 1fr; } }
+</style>

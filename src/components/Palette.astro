@@ -1,0 +1,172 @@
+---
+/**
+ * Shared color palette — one interaction style for every palette on the site
+ * (Logo Design, First Brand Post, Promotional Poster).
+ * Each card is a single button: click / Enter / Space copies its HEX value.
+ */
+import Icon from './Icon.astro';
+import type { Swatch } from '@/data/brand';
+interface Props {
+  title?: string;
+  swatches: Swatch[];
+  note?: string;
+  compact?: boolean;
+  /** Fixed column count on wide screens */
+  cols?: number;
+}
+const { title = 'Color palette', swatches, note = 'HEX values measured from the original artwork — estimates. Select a color to copy its HEX code.', compact = false, cols } = Astro.props;
+---
+<div class:list={['palette', { 'palette--compact': compact, 'palette--cols': !!cols }]} style={cols ? `--cols:${cols}` : undefined}>
+  <h3 class="spec-title">{title}</h3>
+  <ul class="palette__list" data-stagger="scale">
+    {swatches.map((s) => (
+      <li>
+        <button class="swatch" type="button" data-copy={s.hex} aria-label={`${s.name}, ${s.hex}. ${s.role}. Copy HEX code`}>
+          <span class:list={['swatch__chip', { 'swatch__chip--light': !s.dark }]} style={`--chip:${s.hex}`} aria-hidden="true">
+            <span class="swatch__check"><Icon name="check" size={20} strokeWidth={2.5} /></span>
+          </span>
+          <span class="swatch__info" aria-hidden="true">
+            <span class="swatch__name">{s.name}</span>
+            <span class="swatch__role">{s.role}</span>
+          </span>
+          <span class="swatch__foot" aria-hidden="true">
+            <span class="swatch__hex">{s.hex}</span>
+            <span class="swatch__action">
+              <span class="swatch__copy-label"><Icon name="copy" size={14} /> Copy</span>
+              <span class="swatch__done-label"><Icon name="check" size={14} strokeWidth={2.5} /> Copied!</span>
+            </span>
+          </span>
+        </button>
+      </li>
+    ))}
+  </ul>
+  {note && <p class="spec-note">{note}</p>}
+</div>
+
+<style>
+  .palette__list {
+    list-style: none;
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+  }
+  @media (min-width: 640px) { .palette--cols .palette__list { grid-template-columns: repeat(var(--cols), 1fr); } }
+  .palette--compact .palette__list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); }
+  .palette__list > li { display: flex; }
+
+  /* ---- Card ---- */
+  .swatch {
+    --lift: -6px;
+    --card-bg: var(--c-white);
+    --card-shadow: 0 1px 2px rgb(20 20 20 / 0.05);
+    --card-shadow-hover: 0 22px 40px -18px rgb(20 20 20 / 0.35), 0 4px 10px -4px rgb(20 20 20 / 0.12);
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    width: 100%;
+    padding: 0;
+    text-align: left;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card-bg);
+    color: inherit;
+    box-shadow: var(--card-shadow);
+    cursor: copy;
+    transition:
+      transform 380ms var(--ease-out, ease),
+      box-shadow 380ms var(--ease-out, ease),
+      border-color 380ms ease;
+  }
+  :global(.theme-dark) .swatch {
+    --card-bg: var(--c-night-2);
+    --card-shadow-hover: 0 24px 44px -18px rgb(0 0 0 / 0.85), 0 0 0 1px rgb(134 201 138 / 0.45), 0 0 28px -6px rgb(134 201 138 / 0.28);
+  }
+  .swatch:hover,
+  .swatch:focus-visible {
+    transform: translateY(var(--lift));
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgb(46 125 50 / 0.35);
+  }
+  .swatch:active { transform: translateY(calc(var(--lift) / 2)) scale(0.99); }
+  .swatch:focus-visible { outline: none; box-shadow: var(--card-shadow-hover), var(--focus); }
+  :global(.theme-dark) .swatch:focus-visible { box-shadow: var(--card-shadow-hover), var(--focus-dark); }
+
+  /* ---- Chip with sheen highlight ---- */
+  .swatch__chip {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 76px;
+    background: var(--chip);
+    overflow: hidden;
+  }
+  .palette--compact .swatch__chip { height: 60px; }
+  .swatch__chip--light { box-shadow: inset 0 0 0 1px var(--line); }
+  .swatch__chip::after {
+    content: '';
+    position: absolute;
+    inset: -20% auto -20% -60%;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.38), transparent);
+    transform: skewX(-18deg) translateX(0);
+    transition: transform 700ms var(--ease-out, ease);
+    pointer-events: none;
+  }
+  .swatch:hover .swatch__chip::after,
+  .swatch:focus-visible .swatch__chip::after { transform: skewX(-18deg) translateX(420%); }
+
+  .swatch__check {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--c-green);
+    box-shadow: 0 6px 16px -6px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 200ms ease, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .swatch[data-copied] .swatch__check { opacity: 1; transform: none; }
+
+  /* ---- Text ---- */
+  .swatch__info { display: grid; gap: 0.15rem; padding: 0.75rem 0.9rem 0.3rem; }
+  .swatch__name { font-weight: 800; font-size: var(--fs-sm); color: var(--t-strong); }
+  .swatch__role { font-size: 0.75rem; line-height: 1.4; color: var(--t-muted); }
+  .swatch__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 0.35rem 0.5rem 0.5rem;
+    padding: 0.4rem 0.45rem;
+    min-height: 34px;
+    border-radius: 7px;
+    transition: background-color 250ms ease;
+  }
+  .swatch:hover .swatch__foot { background: var(--c-paper); }
+  :global(.theme-dark) .swatch:hover .swatch__foot { background: var(--c-night-3); }
+  .swatch__hex {
+    font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--t-strong);
+  }
+  .swatch__action { position: relative; font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .swatch__copy-label,
+  .swatch__done-label { display: inline-flex; align-items: center; gap: 0.3rem; transition: opacity 200ms ease, transform 200ms ease; }
+  .swatch__copy-label { color: var(--t-muted); opacity: 0.75; }
+  .swatch:hover .swatch__copy-label { opacity: 1; color: var(--c-green-700); }
+  :global(.theme-dark) .swatch:hover .swatch__copy-label { color: var(--c-green-300); }
+  .swatch__done-label { position: absolute; right: 0; top: 50%; translate: 0 -50%; color: var(--c-green-700); opacity: 0; transform: translateY(4px); white-space: nowrap; }
+  :global(.theme-dark) .swatch__done-label { color: var(--c-green-300); }
+  .swatch[data-copied] .swatch__copy-label { opacity: 0; transform: translateY(-4px); }
+  .swatch[data-copied] .swatch__done-label { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swatch { --lift: 0px; }
+    .swatch__chip::after { display: none; }
+  }
+</style>

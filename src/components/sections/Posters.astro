@@ -1,0 +1,86 @@
+---
+import SectionHead from '../SectionHead.astro';
+import ArtImage from '../ArtImage.astro';
+import Palette from '../Palette.astro';
+import TypeSpecs from '../TypeSpecs.astro';
+import { art } from '@/data/media';
+import { promoPalette, promoType } from '@/data/brand';
+---
+<section id="posters" class="section surface-paper-2 posters" aria-labelledby="posters-title">
+  <div class="container container--wide">
+    <SectionHead num="10" label="Promotional Event Poster" title="Grand Opening" id="posters-title">
+      <p class="lead">Conceptual Promotional Designs</p>
+      <p class="posters__note">
+        <span class="badge badge--outline">Concept designs</span>
+        School portfolio designs — not active offers or scheduled events.
+      </p>
+    </SectionHead>
+
+    <div class="main-poster">
+      <div class="main-poster__art" data-reveal="clip">
+        <ArtImage art="promo.01" group="posters" sizes="(min-width: 1180px) 560px, (min-width: 900px) 46vw, 92vw" />
+        <p class="poster-cap"><span>Main poster</span>{art['promo.01'].title.replace(' — main poster', '')}</p>
+      </div>
+      <div class="main-poster__specs" data-reveal="right" style="--delay:120ms">
+        <Palette title="Poster color palette" swatches={promoPalette} compact />
+        <TypeSpecs title="Poster typography" specs={promoType} />
+      </div>
+    </div>
+
+    <div class="sub-head">
+      <h3>Supporting posters</h3>
+    </div>
+    <ul class="support" data-stagger="140">
+      {(['promo.02', 'promo.03'] as const).map((k) => (
+        <li>
+          <ArtImage art={k} group="posters" sizes="(min-width: 900px) 40vw, 92vw" />
+          <p class="poster-cap">{art[k].title}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .posters__note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--space-4);
+    font-size: var(--fs-sm);
+    color: var(--t-muted);
+  }
+  .main-poster {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  @media (min-width: 900px) { .main-poster { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+  .main-poster__art { max-width: 560px; }
+  .main-poster__specs { display: grid; gap: var(--space-7); }
+
+  .support {
+    list-style: none;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  @media (min-width: 640px) { .support { grid-template-columns: 1fr 1fr; } }
+  .support li { max-width: 520px; }
+
+  .poster-cap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin: var(--space-4) 0 0;
+    font-weight: 700;
+    color: var(--c-ink);
+  }
+  .poster-cap span {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c-green);
+  }
+</style>

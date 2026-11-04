@@ -1,0 +1,241 @@
+---
+import { Picture } from 'astro:assets';
+import SectionHead from '../SectionHead.astro';
+import ArtImage from '../ArtImage.astro';
+import LogoArt from '../LogoArt.astro';
+import Palette from '../Palette.astro';
+import TypeSpecs from '../TypeSpecs.astro';
+import Icon from '../Icon.astro';
+import { art } from '@/data/media';
+import { postPalette, postType, firstPostCaption as cap } from '@/data/brand';
+import { getImage } from 'astro:assets';
+
+const supporting = ['post.02', 'post.03', 'post.04', 'post.05'] as const;
+const slides = await Promise.all(
+  supporting.map(async (k) => {
+    const item = art[k];
+    const large = await getImage({ src: item.src, format: 'webp', width: Math.min(item.src.width, 1800), quality: 88 });
+    return { item, large };
+  }),
+);
+---
+<section id="brand-post" class="section theme-dark post-sec" aria-labelledby="post-title">
+  <div class="container container--wide">
+    <SectionHead num="09" label="First Ever Brand Post" title="Our first post: <span class='accent'>Train. Eat. Thrive.</span>" id="post-title" />
+
+    <div class="post">
+      <div class="post__art" data-reveal="clip">
+        <ArtImage art="post.01" group="first-post" sizes="(min-width: 1180px) 620px, (min-width: 900px) 50vw, 92vw" />
+      </div>
+
+      <article class="caption" data-reveal="right" style="--delay:120ms" aria-labelledby="caption-title">
+        <header class="caption__head">
+          <span class="caption__avatar"><LogoArt logo="logo.icon" size="26px" decorative /></span>
+          <div>
+            <p class="caption__brand">Grip &amp; Greens</p>
+            <p class="caption__meta">First brand post · Caption</p>
+          </div>
+        </header>
+        <div class="caption__body">
+          <h3 class="caption__headline" id="caption-title">{cap.headline}</h3>
+          {cap.paragraphs.map((p) => <p>{p}</p>)}
+          <p class="caption__tags">{cap.hashtags.join(' ')}</p>
+          <p class="caption__sig">
+            {cap.signature.map((line, i) => <span class:list={{ 'caption__sig-brand': i === 0 }}>{line}</span>)}
+          </p>
+        </div>
+      </article>
+    </div>
+
+    <div class="specs">
+      <Palette title="Post color palette" swatches={postPalette} compact />
+      <TypeSpecs title="Post typography" specs={postType} />
+    </div>
+
+    <!-- Supporting posts carousel -->
+    <div class="carousel" data-carousel data-reveal="fade" role="region" aria-roledescription="carousel" aria-label="Supporting brand posts">
+      <div class="sub-head carousel__head">
+        <h3>Supporting posts</h3>
+        <div class="carousel__controls">
+          <button class="cbtn" type="button" data-carousel-toggle aria-pressed="false" aria-label="Pause automatic scrolling">
+            <span class="cbtn__pause"><Icon name="pause" size={18} /></span>
+            <span class="cbtn__play"><Icon name="play" size={18} /></span>
+          </button>
+          <button class="cbtn" type="button" data-carousel-prev aria-label="Previous post"><Icon name="chevron-left" size={20} /></button>
+          <button class="cbtn" type="button" data-carousel-next aria-label="Next post"><Icon name="chevron-right" size={20} /></button>
+        </div>
+      </div>
+      <div class="carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Supporting posts. Use the left and right arrow keys to move.">
+      <ul class="carousel__track" data-carousel-track>
+        {slides.map(({ item, large }, i) => (
+          <li class="slide" role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${slides.length}`}>
+            <a
+              class="slide__link"
+              href={large.src}
+              data-lightbox="supporting-posts"
+              data-lightbox-title={item.title}
+              data-lightbox-alt={item.alt}
+              data-lightbox-w={large.attributes.width}
+              data-lightbox-h={large.attributes.height}
+              aria-label={`${item.title} — view larger`}
+              style={`aspect-ratio:${item.src.width} / ${item.src.height}`}
+            >
+              <Picture
+                src={item.src}
+                alt={item.alt}
+                formats={['avif', 'webp']}
+                widths={[360, 540, 720].filter((w) => w < item.src.width).concat(item.src.width)}
+                sizes="(min-width: 768px) 360px, 72vw"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .post-sec { background: var(--c-night); }
+  .post {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  @media (min-width: 900px) { .post { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); } }
+  .post__art :global(.art) { box-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06); }
+
+  /* Caption card — styled as a social post, Facebook UI artifacts removed */
+  .caption {
+    background: var(--c-white);
+    color: #2a2a2a;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .caption__head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgb(31 31 31 / 0.1);
+  }
+  .caption__avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgb(31 31 31 / 0.15);
+    overflow: hidden;
+  }
+  .caption__avatar :global(.logo-art) { width: 22px; }
+  .caption__brand { margin: 0; font-weight: 800; color: var(--c-ink); }
+  .caption__meta { margin: 0; font-size: 0.8125rem; color: #6a645d; }
+  .caption__body { padding: 1.25rem 1.25rem 1.5rem; font-size: var(--fs-sm); line-height: 1.65; }
+  .caption__body p { margin-bottom: 0.9em; }
+  .caption__headline {
+    margin-bottom: 0.8rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--c-ink);
+  }
+  .caption__tags { font-weight: 700; color: var(--c-green); word-spacing: 0.15em; }
+  .caption__sig {
+    display: grid;
+    gap: 0.05rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgb(31 31 31 / 0.18);
+    font-size: 0.8125rem;
+    color: #5b554e;
+  }
+  .caption__sig-brand { font-weight: 800; color: var(--c-ink); }
+
+  .specs {
+    display: grid;
+    gap: var(--space-7);
+    margin-top: clamp(3rem, 5vw, 4.5rem);
+  }
+  @media (min-width: 1024px) { .specs { grid-template-columns: 1fr 1fr; } }
+
+  /* Carousel */
+  .carousel__head { align-items: center; }
+  .carousel__controls { display: flex; gap: 0.5rem; }
+  .cbtn {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--t-on-dark);
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .cbtn:hover { background: var(--t-on-dark); color: var(--c-night); }
+  .cbtn[hidden] { display: none; }
+  .cbtn__play { display: none; }
+  .cbtn[data-state='paused'] .cbtn__pause { display: none; }
+  .cbtn[data-state='paused'] .cbtn__play { display: grid; }
+  :global(html:not(.js)) .carousel__controls { display: none; }
+
+  /* Without JS: a plain horizontally scrollable list */
+  .carousel__viewport {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.25) transparent;
+    border-radius: var(--radius);
+    /* soft edge fade */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .carousel__track {
+    list-style: none;
+    display: flex;
+    gap: clamp(0.85rem, 2vw, 1.5rem);
+    width: max-content;
+    padding: 0.75rem 0 1.5rem;
+  }
+  /* Enhanced (JS): transform-driven infinite strip */
+  .carousel.is-enhanced .carousel__viewport { overflow: hidden; touch-action: pan-y; cursor: grab; }
+  .carousel.is-enhanced.is-dragging .carousel__viewport { cursor: grabbing; }
+  .carousel.is-enhanced .carousel__track { will-change: transform; }
+  .carousel.is-dragging .slide__link { pointer-events: none; }
+
+  .slide { flex: none; }
+  .slide__link {
+    display: block;
+    height: clamp(300px, 34vw, 420px);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -24px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+    cursor: zoom-in;
+    transition: transform 450ms var(--ease-out), box-shadow 450ms var(--ease-out);
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+  .slide__link:hover,
+  .slide__link:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.9), 0 0 0 1px rgb(134 201 138 / 0.4);
+  }
+  .slide__link :global(picture) { display: contents; }
+  .slide__link :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    pointer-events: none;
+  }
+  .carousel__viewport:focus-visible { box-shadow: var(--focus-dark); }
+  @media (max-width: 767px) { .slide__link { height: 300px; } }
+</style>

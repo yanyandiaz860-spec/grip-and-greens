@@ -1,0 +1,342 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
+import { plans } from '@/data/plans';
+import { peso } from '@/data/menu';
+import { owners, instagramUrl } from '@/data/owners';
+---
+<section id="contact" class="section surface-paper grid-paper contact" aria-labelledby="contact-title">
+  <div class="container container--wide">
+    <SectionHead num="12" label="Contact & Inquiry" title="Ask us <span class='accent'>anything</span>" id="contact-title">
+      <p class="lead">Curious about a membership or the café? Send an inquiry and tell us your goal.</p>
+    </SectionHead>
+
+    <div class="contact__grid">
+      <div class="contact__card" data-reveal>
+        <div class="form-note" role="note" aria-labelledby="form-note-title">
+          <Icon name="chat" size={20} />
+          <div>
+            <p class="form-note__title" id="form-note-title">Contact &amp; Inquiry</p>
+            <p>This is a concept portfolio contact form. Entries can be checked, but messages are not currently submitted or stored.</p>
+          </div>
+        </div>
+
+        <form class="form" data-demo-form novalidate aria-labelledby="contact-title">
+          <div class="form__summary" data-error-summary hidden tabindex="-1" role="alert" aria-labelledby="err-title">
+            <p id="err-title"><strong>Please fix the following:</strong></p>
+            <ul></ul>
+          </div>
+
+          <div class="form__row">
+            <div class="field">
+              <label for="f-name">Full name <span aria-hidden="true">*</span></label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="f-name-error" />
+              <p class="field__error" id="f-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="f-email">Email <span aria-hidden="true">*</span></label>
+              <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="f-email-error" />
+              <p class="field__error" id="f-email-error"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-phone">Mobile number <span class="field__opt">(optional)</span></label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="0917 123 4567" aria-describedby="f-phone-hint f-phone-error" />
+            <p class="field__hint" id="f-phone-hint">Philippine mobile number, e.g. 0917 123 4567 or +63 917 123 4567.</p>
+            <p class="field__error" id="f-phone-error"></p>
+          </div>
+
+          <fieldset class="field field--choice">
+            <legend>What is this about?</legend>
+            <div class="choices">
+              <label class="choice">
+                <input class="choice__input" type="radio" name="type" value="membership" checked />
+                <span class="choice__dot" aria-hidden="true"></span>
+                <span class="choice__text">Membership inquiry</span>
+              </label>
+              <label class="choice">
+                <input class="choice__input" type="radio" name="type" value="general" />
+                <span class="choice__dot" aria-hidden="true"></span>
+                <span class="choice__text">General question</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field" data-plan-row>
+            <label for="f-plan">Plan you're interested in</label>
+            <div class="select">
+              <select id="f-plan" name="plan">
+                <option value="">Not sure yet</option>
+                {plans.map((p) => <option value={p.id}>{p.name} — {peso(p.price)} / {p.period}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-message">Message <span aria-hidden="true">*</span></label>
+            <textarea id="f-message" name="message" rows="5" maxlength="500" required aria-describedby="f-message-count f-message-error"></textarea>
+            <p class="field__hint field__hint--end" id="f-message-count" data-counter aria-live="off">0 / 500</p>
+            <p class="field__error" id="f-message-error"></p>
+          </div>
+
+          <p class="form__req"><span aria-hidden="true">*</span> Required field</p>
+          <button class="btn form__submit" type="submit" disabled>
+            Submit inquiry <Icon name="arrow-right" />
+          </button>
+          <noscript><p class="form__nojs">This form needs JavaScript to check your entries.</p></noscript>
+        </form>
+
+        <div class="success" data-form-success hidden tabindex="-1" role="status">
+          <span class="success__icon"><Icon name="check" size={28} strokeWidth={2.25} /></span>
+          <h3 class="success__title">Thanks, <span data-success-name></span>!</h3>
+          <p>
+            Your inquiry is complete. <strong>As this is a concept portfolio, messages are not currently submitted or stored, so nothing was sent.</strong>
+            In a live version, the Grip &amp; Greens team would reply to <strong data-success-email></strong>.
+          </p>
+          <button class="btn btn--ghost" type="button" data-form-reset>Send another inquiry</button>
+        </div>
+      </div>
+
+      <aside class="contact__aside" data-reveal="right" style="--delay:140ms" aria-label="Quick reference">
+        <div class="aside-card">
+          <h3 class="spec-title">Membership plans</h3>
+          <ul class="mini-plans">
+            {plans.map((p) => (
+              <li><span>{p.name}</span><span class="mini-plans__price">{peso(p.price)}<small> / {p.period}</small></span></li>
+            ))}
+          </ul>
+          <a class="aside-link" href="#membership">Compare plans <Icon name="arrow-right" size={16} /></a>
+        </div>
+        <div class="aside-card">
+          <h3 class="spec-title">Talk to an owner</h3>
+          <ul class="mini-owners">
+            {owners.map((o) => (
+              <li>
+                <a href={instagramUrl(o.instagram)} target="_blank" rel="noopener noreferrer">
+                  <Icon name="instagram" size={16} />
+                  <span>{o.name}</span>
+                  <span class="sr-only">on Instagram (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact__grid {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+  @media (min-width: 1024px) { .contact__grid { grid-template-columns: 1.6fr 1fr; gap: var(--space-6); } }
+
+  .contact__card {
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--c-white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .form-note {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    margin-bottom: var(--space-5);
+    background: var(--c-green-50);
+    border: 1px solid rgb(46 125 50 / 0.25);
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    color: #24402a;
+  }
+  .form-note :global(svg) { flex: none; color: var(--c-green); margin-top: 0.15rem; }
+  .form-note p { margin: 0; }
+  .form-note__title { font-weight: 800; color: var(--c-green-700); margin-bottom: 0.15rem !important; }
+
+  .form { display: grid; gap: var(--space-5); }
+  .form__row { display: grid; gap: var(--space-5); }
+  @media (min-width: 640px) { .form__row { grid-template-columns: 1fr 1fr; } }
+
+  .field { display: grid; gap: 0.4rem; margin: 0; padding: 0; border: 0; min-width: 0; }
+  .field[hidden] { display: none; }
+  .field label, .field legend { font-weight: 700; font-size: var(--fs-sm); color: var(--c-ink); padding: 0; }
+  .field label > span[aria-hidden], .form__req span { color: #a3442e; }
+  .field__opt { font-weight: 500; color: var(--t-muted); }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid rgb(31 31 31 / 0.28);
+    border-radius: 10px;
+    background: #fff;
+    font-size: 1rem;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .field textarea { resize: vertical; min-height: 140px; line-height: 1.5; }
+  .field input:hover, .field select:hover, .field textarea:hover { border-color: rgb(31 31 31 / 0.45); }
+  .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+    border-color: var(--c-green);
+    box-shadow: 0 0 0 3px rgb(46 125 50 / 0.25);
+    border-radius: 10px;
+  }
+  .field.has-error input, .field.has-error textarea { border-color: #b3261e; }
+  .field__hint { margin: 0; font-size: 0.8125rem; color: var(--t-muted); }
+  .field__hint--end { text-align: right; }
+  .field__error { margin: 0; font-size: 0.8125rem; font-weight: 700; color: #b3261e; }
+  .field__error:empty { display: none; }
+  .field__error::before { content: '⚠ '; }
+
+  .select { position: relative; }
+  .select select { appearance: none; padding-right: 2.5rem; }
+  .select::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--c-ink);
+    border-bottom: 2px solid var(--c-ink);
+    translate: 0 -70%;
+    rotate: 45deg;
+    pointer-events: none;
+  }
+
+  /* Inquiry type — whole pill is the click target; native radio kept for semantics */
+  .choices {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 480px) { .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 30rem; } }
+  .field .choice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 54px;
+    padding: 0.75rem 1.1rem 0.75rem 1rem;
+    border: 1.5px solid rgb(31 31 31 / 0.22);
+    border-radius: var(--radius-pill);
+    background: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .field .choice:hover { border-color: rgb(46 125 50 / 0.6); background: #fbfdfb; }
+  .field .choice:active { transform: scale(0.99); }
+  .choice__input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+  }
+  .choice__dot {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgb(31 31 31 / 0.4);
+    background: #fff;
+    transition: border-color var(--dur) var(--ease);
+  }
+  .choice__dot::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--c-green);
+    transform: scale(0);
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .choice__text { color: var(--c-ink); }
+  .field .choice:has(.choice__input:checked) {
+    border-color: var(--c-green);
+    background: var(--c-green-50);
+    box-shadow: 0 6px 16px -10px rgb(46 125 50 / 0.6);
+  }
+  .choice__input:checked + .choice__dot { border-color: var(--c-green); }
+  .choice__input:checked + .choice__dot::after { transform: scale(1); }
+  .field .choice:has(.choice__input:focus-visible) { box-shadow: var(--focus); }
+
+  .form__summary {
+    padding: 1rem 1.15rem;
+    border: 2px solid #b3261e;
+    border-radius: var(--radius);
+    background: #fdf1f0;
+    color: #5f1410;
+  }
+  .form__summary ul { margin-top: 0.4rem; padding-left: 1.2rem; display: grid; gap: 0.2rem; }
+  .form__summary a { color: #8c1d18; font-weight: 600; }
+  .form__req { margin: 0; font-size: 0.8125rem; color: var(--t-muted); }
+  .form__submit { justify-self: start; }
+  .form__submit:disabled { opacity: 0.55; cursor: not-allowed; }
+  .form__nojs { margin: 0; font-size: var(--fs-sm); color: #8c1d18; }
+
+  .success { display: grid; gap: var(--space-4); justify-items: start; padding: var(--space-4) 0; }
+  .success[hidden] { display: none; }
+  .success__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--c-green);
+    color: #fff;
+  }
+  .success__title { font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); line-height: 1; }
+
+  .contact__aside { display: grid; gap: var(--space-4); }
+  .aside-card {
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    background: rgb(255 255 255 / 0.75);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+  .mini-plans { list-style: none; display: grid; }
+  .mini-plans li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .mini-plans__price { font-weight: 800; color: var(--c-green-700); white-space: nowrap; }
+  .mini-plans__price small { font-weight: 600; color: var(--t-muted); }
+  .aside-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    margin-top: 0.4rem;
+    font-weight: 700;
+    color: var(--c-green-700);
+    text-decoration: none;
+  }
+  .aside-link:hover { text-decoration: underline; }
+  .mini-owners { list-style: none; display: grid; gap: 0.1rem; }
+  .mini-owners a {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .mini-owners a :global(svg) { color: var(--c-green); flex: none; }
+  .mini-owners a:hover span:first-of-type { text-decoration: underline; }
+</style>

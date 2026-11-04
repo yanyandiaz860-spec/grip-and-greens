@@ -1,0 +1,52 @@
+---
+import SectionHead from '../SectionHead.astro';
+import MediaSlot from '../MediaSlot.astro';
+import ServiceList from '../ServiceList.astro';
+import { gymServices } from '@/data/content';
+---
+<section id="gym" class="section theme-dark grid-paper gym" aria-labelledby="gym-title">
+  <div class="container container--wide">
+    <div class="gym__grid">
+      <div class="gym__text">
+        <SectionHead num="04" label="The Gym" title="Train<span class='accent'>.</span>" id="gym-title">
+          <p class="lead">
+            A fully equipped gym with space for strength, cardio and functional work — plus personal
+            training, group classes, assessments and tools to track your progress.
+          </p>
+        </SectionHead>
+        <div>
+          <ServiceList items={gymServices} label="Fitness services" />
+          <p class="note">Fitness services proposed in our Business Concept Development paper.</p>
+        </div>
+      </div>
+
+      <div class="gym__media" data-stagger="scale">
+        <MediaSlot slot="gym.weight-training" tone="dark" sizes="(min-width: 1024px) 26vw, 50vw" />
+        <MediaSlot slot="gym.cardio" tone="dark" sizes="(min-width: 1024px) 26vw, 50vw" />
+        <MediaSlot slot="gym.functional-area" tone="dark" sizes="(min-width: 1024px) 26vw, 50vw" />
+        <MediaSlot slot="gym.group-class" tone="dark" sizes="(min-width: 1024px) 26vw, 50vw" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gym { background-color: var(--c-night); }
+  .gym__grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  @media (min-width: 1024px) { .gym__grid { grid-template-columns: 1fr 1.05fr; } }
+  .gym :global(.section-title) { font-size: clamp(4.5rem, 3rem + 7vw, 9rem); }
+  .gym__media {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+  @media (min-width: 1024px) {
+    .gym__media { position: sticky; top: calc(var(--header-h) + 2rem); }
+    .gym__media > :global(:nth-child(even)) { translate: 0 2.5rem; }
+  }
+  .note { margin-top: var(--space-4); font-size: var(--fs-xs); color: var(--t-muted); }
+</style>

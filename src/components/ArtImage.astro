@@ -1,0 +1,98 @@
+---
+/**
+ * ArtImage — shows an ORIGINAL submitted artwork (process sheet, post, poster…)
+ * as an optimized responsive image wrapped in a link to a large version.
+ * Without JS the link simply opens the image; with JS it opens the lightbox (M3).
+ * Low-resolution originals are capped at their `maxDisplay` width.
+ */
+import { Picture, getImage } from 'astro:assets';
+import { art, type ArtKey } from '@/data/media';
+import Icon from './Icon.astro';
+
+interface Props {
+  art: ArtKey;
+  sizes: string;
+  priority?: boolean;
+  /** Lightbox group name; items with the same group can be browsed with arrows */
+  group?: string;
+  /** Disable the zoom link (e.g. inside the lightbox itself) */
+  static?: boolean;
+  class?: string;
+  /** Show a "View larger" hint on hover */
+  hint?: boolean;
+}
+
+const { art: key, sizes, priority = false, group, static: isStatic = false, class: cls, hint = true } = Astro.props;
+const item = art[key];
+const nativeW = item.src.width;
+const widths = [320, 480, 640, 960, 1280, 1600].filter((w) => w < nativeW).concat(nativeW);
+const large = await getImage({ src: item.src, format: 'webp', width: Math.min(nativeW, 1800), quality: 88 });
+const cap = 'maxDisplay' in item ? item.maxDisplay : undefined;
+const style = cap ? `--art-max:${cap}px` : undefined;
+---
+{isStatic ? (
+  <figure class:list={['art', cls]} style={style}>
+    <Picture src={item.src} alt={item.alt} formats={['avif', 'webp']} widths={widths} sizes={sizes}
+      loading={priority ? 'eager' : 'lazy'} fetchpriority={priority ? 'high' : 'auto'} decoding="async" />
+  </figure>
+) : (
+  <a
+    class:list={['art', 'art--zoom', cls]}
+    style={style}
+    href={large.src}
+    data-lightbox={group ?? key}
+    data-lightbox-title={item.title}
+    data-lightbox-alt={item.alt}
+    data-lightbox-w={large.attributes.width}
+    data-lightbox-h={large.attributes.height}
+    data-lightbox-max={cap}
+    aria-label={`${item.title} — view larger`}
+  >
+    <Picture src={item.src} alt={item.alt} formats={['avif', 'webp']} widths={widths} sizes={sizes}
+      loading={priority ? 'eager' : 'lazy'} fetchpriority={priority ? 'high' : 'auto'} decoding="async" />
+    {hint && (
+      <span class="art__hint" aria-hidden="true"><Icon name="expand" size={16} /> View larger</span>
+    )}
+  </a>
+)}
+
+<style>
+  .art {
+    position: relative;
+    display: block;
+    margin: 0;
+    width: 100%;
+    max-width: var(--art-max, none);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--c-paper-2);
+    box-shadow: var(--shadow);
+  }
+  .art :global(img) { width: 100%; height: auto; }
+  .art--zoom { cursor: zoom-in; text-decoration: none; }
+  .art--zoom :global(img) { transition: transform 600ms var(--ease); }
+  .art--zoom:hover :global(img) { transform: scale(1.02); }
+  .art__hint {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: rgb(21 24 26 / 0.82);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .art--zoom:hover .art__hint,
+  .art--zoom:focus-visible .art__hint { opacity: 1; transform: none; }
+  @media (hover: none) {
+    .art__hint { opacity: 1; transform: none; }
+  }
+</style>

@@ -1,0 +1,111 @@
+---
+import LogoArt from './LogoArt.astro';
+import Icon from './Icon.astro';
+import { navGroups, contactLink } from '@/data/nav';
+import { owners, instagramUrl } from '@/data/owners';
+import { academic, brand } from '@/data/content';
+---
+<footer class="site-footer theme-dark">
+  <div class="container container--wide">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <div class="site-footer__logo">
+          <LogoArt logo="logo.primary" size="220px" />
+        </div>
+        <p class="site-footer__promise">{brand.promise}</p>
+      </div>
+
+      {navGroups.map((g) => (
+        <nav class="site-footer__col" aria-label={`Footer — ${g.label}`}>
+          <h2 class="site-footer__heading">{g.label}</h2>
+          <ul>
+            {g.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+            {g.label === 'Brand Portfolio' && <li><a href={contactLink.href}>{contactLink.label}</a></li>}
+          </ul>
+        </nav>
+      ))}
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__heading">Co-Owners</h2>
+        <ul>
+          {owners.map((o) => (
+            <li>
+              <a href={instagramUrl(o.instagram)} target="_blank" rel="noopener noreferrer">
+                {o.name}<span class="sr-only"> on Instagram (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>
+        © 2026 Grip &amp; Greens · Concept brand portfolio — {academic.task}, {academic.program},
+        {academic.college}, {academic.school}. Grip &amp; Greens is a proposed business concept: its menu, prices, memberships and events are illustrative and not currently available for purchase.
+      </p>
+      <a class="site-footer__top-link" href="#home">
+        <Icon name="arrow-up" size={18} /> Back to top
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding-block: clamp(3.5rem, 6vw, 5.5rem) 2rem; font-size: var(--fs-sm); }
+  .site-footer__top {
+    display: grid;
+    gap: var(--space-7) var(--space-6);
+    grid-template-columns: 1fr;
+    padding-bottom: var(--space-7);
+    border-bottom: 1px solid var(--line-dark);
+  }
+  @media (min-width: 640px) { .site-footer__top { grid-template-columns: repeat(3, 1fr); } .site-footer__brand { grid-column: 1 / -1; } }
+  @media (min-width: 1024px) { .site-footer__top { grid-template-columns: 1.6fr 1fr 1fr 1.3fr; } .site-footer__brand { grid-column: auto; } }
+
+  .site-footer__logo {
+    width: 220px;
+    padding: 1rem 1.1rem;
+    background: #fff;
+    border-radius: var(--radius);
+  }
+  .site-footer__promise { margin-top: var(--space-5); max-width: 34ch; color: var(--t-on-dark-muted); }
+  .site-footer__heading {
+    margin-bottom: var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--c-green-300);
+  }
+  .site-footer ul { list-style: none; display: grid; gap: 0.35rem; }
+  .site-footer ul a {
+    display: inline-block;
+    padding: 0.2rem 0;
+    color: var(--t-on-dark);
+    text-decoration: none;
+    text-underline-offset: 4px;
+  }
+  .site-footer ul a:hover { text-decoration: underline; text-decoration-color: var(--c-green-300); }
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding-top: var(--space-5);
+    font-size: var(--fs-xs);
+    color: var(--t-on-dark-muted);
+  }
+  .site-footer__bottom p { max-width: 80ch; }
+  .site-footer__top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    font-weight: 700;
+    color: var(--t-on-dark);
+    text-decoration: none;
+  }
+</style>

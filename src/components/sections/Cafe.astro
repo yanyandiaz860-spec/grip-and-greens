@@ -1,0 +1,204 @@
+---
+import SectionHead from '../SectionHead.astro';
+import MediaSlot from '../MediaSlot.astro';
+import ServiceList from '../ServiceList.astro';
+import { cafeServices } from '@/data/content';
+import { menu, peso } from '@/data/menu';
+---
+<section id="cafe" class="section surface-paper-2 cafe" aria-labelledby="cafe-title">
+  <div class="container container--wide">
+    <div class="cafe__grid">
+      <div class="cafe__media" data-stagger="scale">
+        <MediaSlot slot="cafe.interior" tone="cream" class="cafe__wide" sizes="(min-width: 1024px) 46vw, 100vw" />
+        <MediaSlot slot="cafe.drinks-bar" tone="cream" sizes="(min-width: 1024px) 23vw, 50vw" />
+        <MediaSlot slot="cafe.meal-prep" tone="cream" sizes="(min-width: 1024px) 23vw, 50vw" />
+      </div>
+
+      <div class="cafe__text">
+        <SectionHead num="05" label="The Café" title="Eat<span class='accent'>.</span>" id="cafe-title">
+          <p class="lead">
+            A healthy café built around your goal — meals for building muscle or losing weight, protein-rich
+            drinks, snacks, meal prep and nutrition consultation, right after your workout.
+          </p>
+        </SectionHead>
+        <div>
+          <ServiceList items={cafeServices} label="Healthy café services" />
+          <p class="note">Café services proposed in our Business Concept Development paper.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Café menu: browse-only (no cart / checkout) -->
+    <div class="menu" data-tabs data-reveal>
+      <div class="menu__head">
+        <div>
+          <p class="eyebrow eyebrow--start">Healthy café</p>
+          <h3 class="menu__title" id="menu-title">Our Menu</h3>
+        </div>
+        <p class="menu__intro-text">Goal-based meals, drinks and snacks — browse by category.</p>
+      </div>
+
+      <div class="menu__tabs" role="tablist" aria-labelledby="menu-title">
+        {menu.map((c, i) => (
+          <button
+            class="menu__tab"
+            type="button"
+            role="tab"
+            id={`tab-${c.id}`}
+            aria-controls={`panel-${c.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      {menu.map((c, i) => (
+        <div
+          class:list={['menu__panel', { 'is-active': i === 0 }]}
+          role="tabpanel"
+          id={`panel-${c.id}`}
+          aria-labelledby={`tab-${c.id}`}
+          tabindex="0"
+          data-panel
+        >
+          <h4 class="menu__panel-title">{c.label}</h4>
+          <p class="menu__intro">{c.intro}</p>
+          <ul class="menu__items">
+            {c.items.map((item) => (
+              <li class="dish">
+                <MediaSlot slot={item.slot} tone="light" compact sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw" />
+                <div class="dish__body">
+                  <h5 class="dish__name">{item.name}</h5>
+                  <p class="dish__desc">{item.description}</p>
+                  <p class="dish__price">
+                    <span class="dish__amount">{peso(item.price)}</span>
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cafe__grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .cafe__grid { grid-template-columns: 1.05fr 1fr; }
+    .cafe__media { position: sticky; top: calc(var(--header-h) + 2rem); }
+  }
+  /* text first on small screens, media first (left) on desktop */
+  .cafe__text { order: -1; }
+  @media (min-width: 1024px) { .cafe__text { order: 0; } }
+
+  .cafe :global(.section-title) { font-size: clamp(4.5rem, 3rem + 7vw, 9rem); }
+  .cafe__media {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+  .cafe__media :global(.cafe__wide) { grid-column: 1 / -1; }
+  .note { margin-top: var(--space-4); font-size: var(--fs-xs); color: var(--t-muted); }
+
+  /* ---------- Menu ---------- */
+  .menu {
+    margin-top: clamp(4rem, 7vw, 6.5rem);
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--c-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .menu__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-5);
+  }
+  .menu__head .eyebrow { margin-bottom: var(--space-2); }
+  .menu__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 1.8rem + 2.5vw, 3.75rem);
+    line-height: 0.95;
+  }
+  .menu__intro-text {
+    margin: 0;
+    max-width: 40ch;
+    font-size: var(--fs-sm);
+    color: var(--t-muted);
+  }
+
+  .menu__tabs {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.35rem;
+    margin-bottom: var(--space-5);
+    background: var(--c-paper);
+    border-radius: 26px;
+    flex-wrap: wrap;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .menu__tabs::-webkit-scrollbar { display: none; }
+  .menu__tab {
+    flex: none;
+    min-height: 44px;
+    padding: 0.55rem 1.15rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--t-body);
+    white-space: nowrap;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .menu__tab:hover { background: var(--c-white); }
+  .menu__tab[aria-selected='true'] { background: var(--c-ink); color: #fff; }
+
+  :global(html:not(.js)) .menu__tabs { display: none; }
+  :global(.js) .menu__panel:not(.is-active) { display: none; }
+  .menu__panel { border-radius: var(--radius); }
+  :global(.js) .menu__panel-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .menu__panel-title { margin: var(--space-6) 0 var(--space-2); font-size: var(--fs-lg); }
+  .menu__intro { margin-bottom: var(--space-5); color: var(--t-muted); }
+
+  .menu__items {
+    list-style: none;
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .menu__items { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .menu__items { grid-template-columns: repeat(3, 1fr); } }
+  .dish { display: grid; gap: var(--space-4); align-content: start; }
+  @media (max-width: 639px) {
+    .dish { grid-template-columns: 112px 1fr; align-items: start; gap: var(--space-4); }
+    .dish :global(.slot) { aspect-ratio: 1; }
+  }
+  .dish__name { font-size: 1.15rem; font-weight: 800; line-height: 1.3; }
+  .dish__desc { margin-top: 0.35rem; font-size: var(--fs-sm); color: var(--t-muted); }
+  .dish__price {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--space-3);
+  }
+  .dish__amount {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    line-height: 1;
+    color: var(--c-green);
+  }
+</style>

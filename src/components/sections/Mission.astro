@@ -1,0 +1,116 @@
+---
+import SectionHead from '../SectionHead.astro';
+import { mission, vision, taglineParts } from '@/data/content';
+---
+<section id="mission" class="section theme-dark mission" aria-labelledby="mission-title">
+  <div class="container">
+    <SectionHead num="02" label="Mission & Vision" title="What we stand for" id="mission-title" />
+
+    <div class="mv">
+      <article class="mv__card" data-reveal="left">
+        <h3 class="mv__label">Mission</h3>
+        <p class="mv__text">{mission}</p>
+      </article>
+      <article class="mv__card" data-reveal="right" style="--delay:120ms">
+        <h3 class="mv__label">Vision</h3>
+        <p class="mv__text">{vision}</p>
+      </article>
+    </div>
+
+    <div class="tagline">
+      <h3 class="tagline__heading">The tagline, explained</h3>
+      <ol class="tagline__list" data-stagger="150">
+        {taglineParts.map((t, i) => (
+          <li class="tagline__item">
+            <span class="tagline__num">0{i + 1}</span>
+            <span class="tagline__word">{t.word}.</span>
+            <p>{t.meaning}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mission {
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgb(46 125 50 / 0.18), transparent 60%),
+      var(--c-ink);
+  }
+  .mv {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 900px) { .mv { grid-template-columns: 1fr 1fr; gap: var(--space-6); } }
+  .mv__card {
+    position: relative;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius-lg);
+    background: rgb(255 255 255 / 0.03);
+  }
+  .mv__card::before {
+    content: '';
+    position: absolute;
+    left: clamp(1.5rem, 3vw, 2.5rem);
+    top: 0;
+    width: 3rem;
+    height: 3px;
+    background: var(--c-green-300);
+  }
+  .mv__label {
+    margin-bottom: var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--c-green-300);
+  }
+  .mv__text {
+    font-size: var(--fs-lg);
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--t-on-dark);
+  }
+
+  .tagline { margin-top: clamp(3.5rem, 6vw, 5.5rem); }
+  .tagline__heading {
+    margin-bottom: var(--space-5);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--t-on-dark-muted);
+  }
+  .tagline__list {
+    list-style: none;
+    display: grid;
+    border-top: 1px solid var(--line-dark);
+  }
+  @media (min-width: 900px) { .tagline__list { grid-template-columns: repeat(3, 1fr); } }
+  .tagline__item {
+    display: grid;
+    gap: 0.5rem;
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  @media (min-width: 900px) {
+    .tagline__item { padding: var(--space-6) var(--space-5) 0; border-bottom: 0; }
+    .tagline__item:first-child { padding-left: 0; }
+    .tagline__item + .tagline__item { border-left: 1px solid var(--line-dark); }
+  }
+  .tagline__num { font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.2em; color: var(--c-green-300); }
+  .tagline__word {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--t-on-dark);
+  }
+  .tagline__item:nth-child(2) .tagline__word { color: var(--c-green-300); -webkit-text-stroke: 0; }
+  .tagline__item p { max-width: 32ch; color: var(--t-on-dark-muted); }
+  @supports not (-webkit-text-stroke: 1px black) {
+    .tagline__word { color: var(--t-on-dark); }
+  }
+</style>

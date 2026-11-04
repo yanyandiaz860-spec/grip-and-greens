@@ -1,0 +1,22 @@
+---
+/** Numbered section header: eyebrow rule label + display title + optional lead. */
+interface Props {
+  num?: string;
+  label: string;
+  title: string;
+  /** id for the <h2>, referenced by the section's aria-labelledby */
+  id: string;
+  center?: boolean;
+  class?: string;
+}
+const { num, label, title, id, center = false, class: cls } = Astro.props;
+---
+<div class:list={['section-head', { 'section-head--center': center }, cls]} data-stagger="90">
+  <p class:list={['eyebrow', { 'eyebrow--start': !center }]}>
+    {num && <span class="eyebrow__num">{num}</span>}
+    {num && <span aria-hidden="true">·</span>}
+    <span>{label}</span>
+  </p>
+  <h2 class="section-title" id={id} set:html={title} />
+  <slot />
+</div>

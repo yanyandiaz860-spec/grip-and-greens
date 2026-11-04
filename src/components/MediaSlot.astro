@@ -1,0 +1,165 @@
+---
+/**
+ * MediaSlot — a replaceable image container.
+ * • If src/media/<folder>/<name>.<ext> exists → renders an optimized responsive image.
+ * • Otherwise → renders a labeled placeholder (never a fake photo or broken image).
+ */
+import { Picture } from 'astro:assets';
+import { resolveSlot, type SlotKey } from '@/data/media';
+import Icon from './Icon.astro';
+
+interface Props {
+  slot: SlotKey;
+  /** Visual tone of the empty placeholder */
+  tone?: 'light' | 'dark' | 'cream';
+  /** `sizes` attribute for the responsive image */
+  sizes?: string;
+  /** Load eagerly (above the fold) */
+  priority?: boolean;
+  /** Override the registry aspect ratio */
+  ratio?: string;
+  /** Hide the placeholder sub-caption (compact cards) */
+  compact?: boolean;
+  class?: string;
+}
+
+const { slot, tone = 'light', sizes = '(min-width: 1024px) 50vw, 100vw', priority = false, ratio, compact = false, class: cls } = Astro.props;
+const s = resolveSlot(slot);
+const img = s.src;
+const aspect = ratio ?? s.ratio;
+const ratioLabel = aspect.replace(/\s/g, '');
+---
+{img ? (
+  <figure class:list={['slot', 'slot--filled', cls]} style={`--ratio:${aspect}`} data-slot={s.key}>
+    <Picture
+      src={img}
+      alt={s.alt}
+      formats={['avif', 'webp']}
+      widths={[400, 640, 960, 1280, 1600].filter((w) => w <= img.width)}
+      sizes={sizes}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : 'auto'}
+      decoding="async"
+      style={s.position ? `object-position:${s.position}` : undefined}
+    />
+  </figure>
+) : (
+  <figure
+    class:list={['slot', 'slot--empty', `slot--${tone}`, { 'slot--compact': compact }, cls]}
+    style={`--ratio:${aspect}`}
+    data-slot={s.key}
+    role="img"
+    aria-label={`Image placeholder: ${s.label}. Photo to be added.`}
+  >
+    <div class="slot__inner" aria-hidden="true">
+      <span class="slot__icon"><Icon name={s.icon} size={26} strokeWidth={1.5} /></span>
+      {compact ? <span class="slot__meta">Photo coming soon</span> : (
+        <>
+          <span class="slot__label">{s.label}</span>
+          <span class="slot__meta">Image coming soon · {ratioLabel}</span>
+        </>
+      )}
+    </div>
+  </figure>
+)}
+
+<style>
+  .slot {
+    position: relative;
+    margin: 0;
+    aspect-ratio: var(--ratio);
+    border-radius: var(--radius);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .slot--filled :global(picture) { display: block; height: 100%; }
+  .slot--filled :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- Empty placeholder ---------- */
+  .slot--empty {
+    --ph-bg: #fbfaf7;
+    --ph-fg: var(--c-ink);
+    --ph-muted: #6d665e;
+    --ph-line: rgb(46 125 50 / 0.1);
+    --ph-border: rgb(31 31 31 / 0.18);
+    --ph-icon-bg: var(--c-white);
+    --ph-ring: rgb(46 125 50 / 0.16);
+    display: grid;
+    place-items: center;
+    background-color: var(--ph-bg);
+    background-image:
+      linear-gradient(var(--ph-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ph-line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center;
+    border: 1.5px dashed var(--ph-border);
+    color: var(--ph-fg);
+  }
+  .slot--cream {
+    --ph-bg: #efe9df;
+    --ph-line: rgb(93 66 47 / 0.09);
+    --ph-border: rgb(93 66 47 / 0.28);
+    --ph-icon-bg: #f8f4ee;
+    --ph-ring: rgb(93 66 47 / 0.16);
+    --ph-muted: #6a5646;
+  }
+  .slot--dark {
+    --ph-bg: var(--c-night-2);
+    --ph-fg: var(--t-on-dark);
+    --ph-muted: #a9afb3;
+    --ph-line: rgb(134 201 138 / 0.08);
+    --ph-border: rgb(255 255 255 / 0.2);
+    --ph-icon-bg: var(--c-night-3);
+    --ph-ring: rgb(134 201 138 / 0.14);
+  }
+  /* sketch construction circle */
+  .slot--empty::before {
+    content: '';
+    position: absolute;
+    width: min(62%, 220px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid var(--ph-ring);
+    outline: 1px solid var(--ph-ring);
+    outline-offset: 16px;
+    z-index: -1;
+  }
+  .slot__inner {
+    display: grid;
+    justify-items: center;
+    gap: 0.45rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .slot__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ph-icon-bg);
+    border: 1px solid var(--ph-border);
+    color: var(--c-green);
+    margin-bottom: 0.25rem;
+  }
+  .slot--dark .slot__icon { color: var(--c-green-300); }
+  .slot__label {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.35;
+    max-width: 22ch;
+  }
+  .slot__meta {
+    font-size: 0.75rem;
+    color: var(--ph-muted);
+    letter-spacing: 0.02em;
+  }
+  .slot--compact .slot__icon { width: 40px; height: 40px; margin: 0; }
+  .slot--compact::before { width: 46%; outline-offset: 10px; }
+</style>

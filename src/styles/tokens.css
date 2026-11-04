@@ -1,0 +1,92 @@
+/* ============================================================
+   GRIP & GREENS — DESIGN TOKENS
+   "Sketchbook to Training Floor"
+   Brand colors are pixel-sampled from the original logo files
+   (estimates). UI-only tints are marked as such.
+   ============================================================ */
+:root {
+  /* Brand (sampled from logo — estimates) */
+  --c-green: #2e7d32;        /* ampersand + rules */
+  --c-ink: #1f1f1f;          /* wordmark */
+  --c-slate: #2c3135;        /* icon ring */
+  --c-olive: #3d5e2c;        /* leaf */
+  --c-brown: #5d422f;        /* tagline */
+  --c-cream: #ded4ca;        /* dial face */
+  --c-white: #ffffff;
+
+  /* UI-only derivatives (not brand colors) */
+  --c-green-700: #236127;    /* hover / pressed */
+  --c-green-300: #86c98a;    /* green text on dark surfaces (contrast-safe) */
+  --c-green-50: #e9f2e7;     /* soft tint */
+  --c-paper: #f5f2ec;        /* page background (lightened dial cream) */
+  --c-paper-2: #ece6dc;      /* alt paper */
+  --c-night: #15181a;        /* gym / dark sections (deepened ring slate) */
+  --c-night-2: #1e2225;      /* raised surfaces on dark */
+  --c-night-3: #2a2f33;
+
+  /* Text */
+  --t-strong: var(--c-ink);
+  --t-body: #34302c;
+  --t-muted: #5e574f;
+  --t-on-dark: #f3f1ed;
+  --t-on-dark-muted: #b4b9bc;
+
+  /* Lines */
+  --line: rgb(31 31 31 / 0.12);
+  --line-strong: rgb(31 31 31 / 0.22);
+  --line-dark: rgb(255 255 255 / 0.12);
+  --grid-line: rgb(46 125 50 / 0.07);
+  --grid-line-dark: rgb(134 201 138 / 0.06);
+
+  /* Type */
+  --font-display: 'Bebas Neue', 'Oswald', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-specimen-montserrat: 'Montserrat', var(--font-body);
+  --font-specimen-archivo: 'Archivo Black', var(--font-body);
+  --font-specimen-opensans: 'Open Sans', var(--font-body);
+
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-base: 1.0625rem;
+  --fs-md: clamp(1.125rem, 1.05rem + 0.35vw, 1.3rem);
+  --fs-lg: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem);
+  --fs-h3: clamp(1.75rem, 1.4rem + 1.2vw, 2.4rem);
+  --fs-h2: clamp(2.75rem, 1.9rem + 3.6vw, 5.25rem);
+  --fs-hero: clamp(3.75rem, 2rem + 7.5vw, 8.5rem);
+
+  --lh-tight: 0.92;
+  --lh-snug: 1.25;
+  --lh-body: 1.65;
+
+  --track-label: 0.28em;
+
+  /* Space & layout */
+  --container: 1200px;
+  --container-wide: 1360px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --section-y: clamp(4.5rem, 3rem + 6vw, 8.5rem);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgb(20 20 20 / 0.06), 0 1px 1px rgb(20 20 20 / 0.04);
+  --shadow: 0 10px 30px -12px rgb(20 20 20 / 0.18), 0 2px 6px rgb(20 20 20 / 0.06);
+  --shadow-lg: 0 30px 60px -24px rgb(20 20 20 / 0.28);
+
+  --header-h: 68px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 220ms;
+
+  --focus: 0 0 0 3px var(--c-paper), 0 0 0 5px var(--c-green);
+  --focus-dark: 0 0 0 3px var(--c-night), 0 0 0 5px var(--c-green-300);
+}

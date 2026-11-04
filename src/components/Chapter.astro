@@ -1,0 +1,95 @@
+---
+/** Chapter band announcing each half of the page (design flow + rubric visibility). */
+interface Props {
+  title: string;
+  items: { num: string; label: string; href: string }[];
+  tone?: 'paper' | 'green';
+}
+const { title, items, tone = 'paper' } = Astro.props;
+---
+<nav class:list={['chapter', `chapter--${tone}`]} aria-label={`${title} sections`}>
+  <div class="container container--wide chapter__inner">
+    <p class="chapter__title" data-reveal="left">{title}</p>
+    <ol class="chapter__list" data-stagger="60">
+      {items.map((i) => (
+        <li><a href={i.href}><span class="chapter__num">{i.num}</span><span class="chapter__label">{i.label}</span></a></li>
+      ))}
+    </ol>
+  </div>
+</nav>
+
+<style>
+  .chapter { padding-block: clamp(1.75rem, 3.5vw, 2.5rem); border-block: 1px solid var(--line); }
+  .chapter--paper { background: var(--c-paper-2); }
+  .chapter--green { background: var(--c-green); color: #fff; border-color: var(--c-green); }
+
+  .chapter__inner {
+    display: grid;
+    gap: 1rem 2rem;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .chapter__inner { grid-template-columns: auto 1fr; }
+  }
+
+  .chapter__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--c-brown);
+  }
+  .chapter__title::before { content: ''; width: 2.25rem; height: 2px; background: var(--c-green); }
+  .chapter--green .chapter__title { color: #fff; }
+  .chapter--green .chapter__title::before { background: #fff; }
+  @media (min-width: 1024px) {
+    .chapter__title { padding-right: 2rem; border-right: 1px solid var(--line-strong); min-height: 3rem; }
+    .chapter--green .chapter__title { border-right-color: rgb(255 255 255 / 0.4); }
+  }
+
+  .chapter__list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem clamp(1rem, 1.7vw, 1.6rem);
+  }
+  .chapter__list a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    min-height: 44px;
+    align-items: center;
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 1.05rem + 0.55vw, 1.6rem);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .chapter--green .chapter__list a { color: #fff; }
+  .chapter__num {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--c-green);
+    transform: translateY(-0.35em);
+  }
+  .chapter--green .chapter__num { color: #d7ecd8; }
+  .chapter__label {
+    background: linear-gradient(currentColor, currentColor) left bottom / 0 2px no-repeat;
+    padding-bottom: 3px;
+    transition: background-size 300ms var(--ease);
+  }
+  .chapter__list a:hover .chapter__label,
+  .chapter__list a:focus-visible .chapter__label { background-size: 100% 2px; }
+  .chapter--paper .chapter__list a:hover { color: var(--c-green-700); }
+  .chapter--green :focus-visible { box-shadow: 0 0 0 3px var(--c-green), 0 0 0 5px #fff; }
+</style>

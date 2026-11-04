@@ -1,0 +1,68 @@
+---
+/**
+ * LogoArt — displays an ORIGINAL logo file, framed tightly with a CSS-only crop
+ * (the supplied PNGs are 2000×2000 with wide white margins). The file itself is
+ * never modified, recolored or redrawn. Always place on a white surface.
+ */
+import { Picture } from 'astro:assets';
+import { art } from '@/data/media';
+
+type LogoKey = 'logo.primary' | 'logo.secondary' | 'logo.icon';
+
+/* Measured content bounding boxes (fractions of the 2000px square) + small margin */
+const CROPS: Record<LogoKey, { x: number; y: number; w: number; h: number }> = {
+  'logo.primary': { x: 0.1425, y: 0.321, w: 0.7675, h: 0.358 },
+  'logo.secondary': { x: 0.1715, y: 0.1985, w: 0.657, h: 0.5775 },
+  'logo.icon': { x: 0.335, y: 0.245, w: 0.3495, h: 0.5465 },
+};
+
+interface Props {
+  logo: LogoKey;
+  /** CSS length for the rendered (cropped) width, used for `sizes`. e.g. "180px" or "40vw" */
+  size: string;
+  /** Show the full uncropped artboard instead (portfolio display) */
+  full?: boolean;
+  priority?: boolean;
+  /** Decorative usage (e.g. header link already labelled) */
+  decorative?: boolean;
+  class?: string;
+}
+
+const { logo, size, full = false, priority = false, decorative = false, class: cls } = Astro.props;
+const item = art[logo];
+const c = full ? { x: 0, y: 0, w: 1, h: 1 } : CROPS[logo];
+const ratio = (c.w / c.h).toFixed(4);
+const style = `--ratio:${ratio};--iw:${(100 / c.w).toFixed(3)}%;--il:${((-c.x / c.w) * 100).toFixed(3)}%;--it:${((-c.y / c.h) * 100).toFixed(3)}%`;
+---
+<span class:list={['logo-art', cls]} style={style} data-logo={logo}>
+  <Picture
+    src={item.src}
+    alt={decorative ? '' : item.alt}
+    formats={['avif', 'webp']}
+    quality={90}
+    widths={[320, 480, 800, 1200, 1600, 2000]}
+    sizes={`calc(${size} / ${c.w.toFixed(4)})`}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    decoding="async"
+  />
+</span>
+
+<style>
+  .logo-art {
+    position: relative;
+    display: block;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    background: #fff;
+  }
+  .logo-art :global(picture) { display: contents; }
+  .logo-art :global(img) {
+    position: absolute;
+    left: var(--il);
+    top: var(--it);
+    width: var(--iw);
+    max-width: none;
+    height: auto;
+  }
+</style>

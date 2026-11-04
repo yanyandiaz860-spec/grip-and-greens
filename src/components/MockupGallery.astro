@@ -1,0 +1,191 @@
+---
+/**
+ * MockupGallery — a self-playing slideshow card for one Brand Applications category.
+ * Photos crossfade with a slow zoom; selecting the card opens the full gallery
+ * (uncropped photo + title + details) in the shared lightbox.
+ * Without JS the first photo shows and links to its large version.
+ */
+import { Picture, getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { mockupGallery, type MockupFolder } from '@/data/media';
+
+interface Props {
+  folder: MockupFolder;
+  label: string;
+  /** Delay before the first change, so cards don't all switch at once */
+  offset?: number;
+}
+
+const { folder, label, offset = 0 } = Astro.props;
+const group = `mockups-${folder}`;
+const slides = await Promise.all(
+  mockupGallery(folder).map(async (item) => ({
+    ...item,
+    large: await getImage({ src: item.src, format: 'webp', width: Math.min(item.src.width, 1800), quality: 85 }),
+  })),
+);
+---
+<div class="mock" data-slideshow data-offset={offset} role="region" aria-roledescription="slideshow" aria-label={`${label} mockups`}>
+  {slides.map((s, i) => (
+    <a
+      class:list={['mock__slide', { 'is-active': i === 0 }]}
+      href={s.large.src}
+      data-slide
+      data-lightbox={group}
+      data-lightbox-title={s.title}
+      data-lightbox-detail={s.detail}
+      data-lightbox-alt={s.alt}
+      data-lightbox-w={s.large.attributes.width}
+      data-lightbox-h={s.large.attributes.height}
+      aria-label={`${s.title} — view ${label} gallery`}
+      aria-hidden={i === 0 ? undefined : 'true'}
+      tabindex={i === 0 ? undefined : -1}
+    >
+      <Picture
+        src={s.src}
+        alt={s.alt}
+        formats={['avif', 'webp']}
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 768px) 30vw, 92vw"
+        loading="lazy"
+        decoding="async"
+      />
+      <span class="mock__caption">
+        <span class="mock__title">{s.title}</span>
+        <span class="mock__hint"><Icon name="expand" size={14} /> View gallery</span>
+      </span>
+    </a>
+  ))}
+
+  {slides.length > 1 && (
+    <div class="mock__controls">
+      <button class="mock__toggle" type="button" data-slide-toggle aria-pressed="false" aria-label={`Pause ${label} slideshow`}>
+        <span class="mock__pause"><Icon name="pause" size={14} strokeWidth={2.5} /></span>
+        <span class="mock__play"><Icon name="play" size={14} strokeWidth={2.5} /></span>
+      </button>
+      {slides.map((s, i) => (
+        <button
+          class="mock__dot"
+          type="button"
+          data-slide-dot={i}
+          aria-label={`Show ${s.title}`}
+          aria-current={i === 0 ? 'true' : undefined}
+        ><span></span></button>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .mock {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--c-paper-2);
+    box-shadow: var(--shadow);
+    transition: box-shadow 400ms var(--ease-out);
+  }
+  .mock:hover { box-shadow: var(--shadow-lg); }
+
+  .mock__slide {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    cursor: zoom-in;
+    color: #fff;
+    text-decoration: none;
+    transition: opacity 1100ms ease;
+  }
+  .mock__slide.is-active { opacity: 1; pointer-events: auto; z-index: 1; }
+  .mock__slide:focus-visible { outline: 3px solid #fff; outline-offset: -6px; box-shadow: none; }
+
+  .mock__slide :global(picture) { display: block; height: 100%; }
+  .mock__slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.001);
+    transition: transform 6500ms linear;
+  }
+  .mock__slide.is-active :global(img) { transform: scale(1.07); }
+
+  .mock__caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 2.75rem 0.9rem 0.8rem;
+    background: linear-gradient(to top, rgb(12 14 15 / 0.82), rgb(12 14 15 / 0));
+  }
+  .mock__title { font-weight: 800; font-size: var(--fs-sm); line-height: 1.25; }
+  .mock__hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .mock:hover .mock__hint,
+  .mock__slide:focus-visible .mock__hint { opacity: 1; transform: none; }
+  @media (hover: none) { .mock__hint { opacity: 1; transform: none; } }
+
+  .mock__controls {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.05rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: var(--radius-pill);
+    background: rgb(12 14 15 / 0.62);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  :global(html:not(.js)) .mock__controls { display: none; }
+  .mock__toggle,
+  .mock__dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+  }
+  .mock__toggle[hidden] { display: none; }
+  .mock__toggle:focus-visible,
+  .mock__dot:focus-visible { box-shadow: 0 0 0 2px #fff; }
+  .mock__play { display: none; }
+  .mock__pause, .mock__play { line-height: 0; }
+  .mock__toggle[data-state='paused'] .mock__pause { display: none; }
+  .mock__toggle[data-state='paused'] .mock__play { display: block; }
+  .mock__dot span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.5);
+    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .mock__dot:hover span { background: #fff; }
+  .mock__dot[aria-current='true'] span { background: var(--c-green-300); transform: scale(1.3); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mock__slide { transition: none; }
+    .mock__slide :global(img),
+    .mock__slide.is-active :global(img) { transform: none; transition: none; }
+  }
+</style>

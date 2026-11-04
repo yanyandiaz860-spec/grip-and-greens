@@ -1,0 +1,44 @@
+---
+/* Self-hosted fonts (unicode-range subsets: only used glyph ranges download) */
+import '@fontsource/bebas-neue/400.css';
+import '@fontsource-variable/manrope/wght.css';
+/* Specimen-only typefaces, used solely to render the portfolio typography samples */
+import '@fontsource/open-sans/latin-400.css';
+import '@fontsource/montserrat/latin-600.css';
+import '@fontsource/montserrat/latin-700.css';
+import '@fontsource/montserrat/latin-900.css';
+import '@fontsource/archivo-black/latin-400.css';
+
+import Loader from '@/components/Loader.astro';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f2ec" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/icon-192.png" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <Loader />
+    <slot />
+  </body>
+</html>

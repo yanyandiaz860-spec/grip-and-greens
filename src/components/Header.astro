@@ -1,0 +1,188 @@
+---
+import LogoArt from './LogoArt.astro';
+import Icon from './Icon.astro';
+import { navGroups, contactLink } from '@/data/nav';
+---
+<header class="site-header" data-header>
+  <div class="container container--wide site-header__bar">
+    <a class="site-header__brand" href="#home" aria-label="Grip & Greens — back to top">
+      <LogoArt logo="logo.primary" size="128px" priority decorative />
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+    >
+      <span class="menu-toggle__open"><Icon name="menu" size={22} /></span>
+      <span class="menu-toggle__close"><Icon name="x" size={22} /></span>
+      <span class="menu-toggle__text">Menu</span>
+    </button>
+
+    <nav class="site-nav" id="site-menu" aria-label="Main" data-menu>
+      {navGroups.map((g, gi) => (
+        <div class="site-nav__group">
+          <p class="site-nav__group-label">{g.label}</p>
+          <ul>
+            {g.links.map((l) => (
+              <li><a href={l.href} data-nav-link>{l.label}</a></li>
+            ))}
+          </ul>
+          {gi === 0 && <span class="site-nav__divider" aria-hidden="true" />}
+        </div>
+      ))}
+      <a class="btn site-nav__cta" href={contactLink.href} data-nav-link>
+        {contactLink.label}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: saturate(1.4) blur(10px);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+    box-shadow: 0 6px 24px -18px rgb(0 0 0 / 0.35);
+  }
+  .site-header__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    height: var(--header-h);
+  }
+  .site-header__brand {
+    display: block;
+    width: 128px;
+    flex: none;
+    border-radius: 4px;
+  }
+
+  /* Desktop nav */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .site-nav__group { display: flex; align-items: center; gap: var(--space-5); }
+  .site-nav__group-label { display: none; }
+  .site-nav ul { display: flex; gap: 0.25rem; list-style: none; }
+  .site-nav ul a {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.6rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--t-body);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: color var(--dur) var(--ease);
+  }
+  .site-nav ul a::after {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.2rem;
+    height: 2px;
+    background: var(--c-green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .site-nav ul a:hover { color: var(--c-ink); }
+  .site-nav ul a:hover::after,
+  .site-nav ul a[aria-current='true']::after { transform: scaleX(1); }
+  .site-nav ul a[aria-current='true'] { color: var(--c-green-700); }
+  .site-nav__divider {
+    width: 1px;
+    height: 22px;
+    background: var(--line-strong);
+  }
+  .site-nav__cta { min-height: 42px; padding: 0.55rem 1.25rem; }
+
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--c-white);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+  }
+  .menu-toggle__open,
+  .menu-toggle__close { display: inline-flex; }
+  .menu-toggle__close { display: none; }
+  .menu-toggle[aria-expanded='true'] .menu-toggle__open { display: none; }
+  .menu-toggle[aria-expanded='true'] .menu-toggle__close { display: inline-flex; }
+
+  /* Collapsed nav (tablet + phone) */
+  @media (max-width: 1179px) {
+    .menu-toggle { display: inline-flex; }
+    .site-nav {
+      position: fixed;
+      inset: var(--header-h) 0 0 0;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-6);
+      padding: var(--space-6) var(--gutter) var(--space-7);
+      background: var(--c-white);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .site-nav.is-open { display: flex; animation: menu-in 240ms var(--ease); }
+    .site-nav__group { flex-direction: column; align-items: stretch; gap: var(--space-2); }
+    .site-nav__group-label {
+      display: block;
+      margin: 0;
+      font-size: var(--fs-xs);
+      font-weight: 700;
+      letter-spacing: var(--track-label);
+      text-transform: uppercase;
+      color: var(--c-brown);
+    }
+    .site-nav ul { flex-direction: column; gap: 0; }
+    .site-nav ul a {
+      padding: 0.85rem 0;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: var(--c-ink);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+    }
+    .site-nav ul a::after { display: none; }
+    .site-nav__divider { display: none; }
+    .site-nav__cta { align-self: flex-start; min-height: 52px; padding-inline: 2rem; }
+  }
+  /* Without JS the collapsed nav stays reachable as a simple list */
+  :global(html:not(.js)) .menu-toggle { display: none; }
+  @media (max-width: 1179px) {
+    :global(html:not(.js)) .site-nav {
+      position: static;
+      display: flex;
+    }
+    :global(html:not(.js)) .site-header__bar { height: auto; flex-wrap: wrap; padding-block: 0.75rem; }
+  }
+  @keyframes menu-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: none; }
+  }
+</style>

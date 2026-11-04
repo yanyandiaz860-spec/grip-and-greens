@@ -1,0 +1,180 @@
+---
+import MediaSlot from '../MediaSlot.astro';
+import Icon from '../Icon.astro';
+import { gymServices, cafeServices, audience } from '@/data/content';
+import { plans } from '@/data/plans';
+
+const facts = [
+  { value: String(gymServices.length), label: 'Fitness services' },
+  { value: String(cafeServices.length), label: 'Healthy café services' },
+  { value: String(plans.length), label: 'Membership options' },
+  { value: audience.ageRange, label: 'Ages we serve' },
+];
+---
+<section id="home" class="hero surface-paper grid-paper" aria-labelledby="hero-title">
+  <div class="container container--wide hero__grid">
+    <div class="hero__copy" data-stagger="110">
+      <p class="eyebrow eyebrow--start">Gym + Healthy Café · Brand Portfolio</p>
+
+      <h1 id="hero-title" class="hero__title display">
+        <span class="sr-only">Grip &amp; Greens — </span>A gym and a healthy café, <span class="accent">under one roof.</span>
+      </h1>
+      <p class="lead hero__lead">
+        Grip &amp; Greens brings training, goal-based meals and nutrition guidance together — so you never
+        have to choose between a good workout and a good meal.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn" href="#story">Explore the concept <Icon name="arrow-right" /></a>
+        <a class="btn btn--ghost" href="#logo">View the brand portfolio</a>
+      </div>
+    </div>
+
+    <div class="hero__media" role="group" aria-label="Gym and café preview" data-stagger="scale">
+      <div class="hero__tile hero__tile--gym" data-parallax="0.09">
+        <span class="hero__tag"><span class="hero__tag-word">Train</span> The gym</span>
+        <MediaSlot slot="hero.gym" tone="dark" priority sizes="(min-width: 1024px) 24vw, 46vw" />
+      </div>
+      <div class="hero__tile hero__tile--cafe" data-parallax="-0.06">
+        <span class="hero__tag"><span class="hero__tag-word">Eat</span> The café</span>
+        <MediaSlot slot="hero.cafe" tone="cream" priority sizes="(min-width: 1024px) 24vw, 46vw" />
+      </div>
+      <div class="hero__plus" aria-hidden="true">+</div>
+    </div>
+  </div>
+
+  <div class="container container--wide">
+    <dl class="hero__facts" data-stagger="90">
+      {facts.map((f) => (
+        <div class="hero__fact">
+          <dt>{f.label}</dt>
+          <dd>{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: clamp(2rem, 1.5rem + 2.5vw, 3.75rem) clamp(2.5rem, 4vw, 4rem);
+    overflow: hidden;
+  }
+  /* fade the construction grid toward the bottom */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, var(--c-paper));
+    pointer-events: none;
+  }
+  .hero > * { position: relative; z-index: 1; }
+
+  .hero__grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .hero__grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
+  }
+
+  .hero__title {
+    font-size: clamp(3rem, 1.6rem + 4.6vw, 6rem);
+    max-width: 14ch;
+  }
+  .hero__lead { max-width: 46ch; margin-top: var(--space-5); }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  /* Media pair */
+  .hero__media {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+  .hero__tile { position: relative; }
+  .hero__tile--cafe { margin-top: clamp(2rem, 6vw, 4.5rem); }
+  .hero__tile--gym :global(.slot) { box-shadow: var(--shadow-lg); }
+  .hero__tile--cafe :global(.slot) { box-shadow: var(--shadow); }
+  .hero__tag {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--t-muted);
+  }
+  .hero__tag-word {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--c-ink);
+  }
+  .hero__tile--cafe .hero__tag-word { color: var(--c-green); }
+  .hero__plus {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: clamp(44px, 5vw, 60px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--c-green);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    line-height: 1;
+    box-shadow: 0 0 0 6px var(--c-paper);
+    z-index: 2;
+  }
+
+  /* Facts band */
+  .hero__facts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: clamp(3rem, 6vw, 5rem) 0 0;
+    border-top: 2px solid var(--c-ink);
+  }
+  @media (min-width: 768px) { .hero__facts { grid-template-columns: repeat(4, 1fr); } }
+  .hero__fact {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.35rem;
+    padding: 1.1rem 1rem 0 0;
+  }
+  .hero__fact + .hero__fact { padding-left: 1rem; border-left: 1px solid var(--line); }
+  @media (max-width: 767px) {
+    .hero__fact:nth-child(3) { padding-left: 0; border-left: 0; }
+    .hero__fact:nth-child(n + 3) { margin-top: 1rem; }
+  }
+  .hero__fact dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+    line-height: 0.9;
+    color: var(--c-ink);
+  }
+  .hero__fact dt {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--t-muted);
+  }
+</style>

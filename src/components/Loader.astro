@@ -1,0 +1,379 @@
+---
+/**
+ * Branded intro / loader — "the scale dial".
+ *
+ * The ORIGINAL icon-only logo (unmodified) sits inside a measuring dial. A needle
+ * sweeps across the dial ticks while a live counter climbs to 100%; ticks turn green
+ * as the needle passes, and TRAIN · EAT · THRIVE light up in turn. At 100% a pulse
+ * ring fires and the screen splits open onto the page.
+ *
+ * Progress is tied to real readiness (DOM + web fonts): the needle never claims 100%
+ * before the page is ready. Timing: ~4.5 s on the first visit of a session, ~2.5 s on
+ * repeat visits. Click / tap / any key skips. A hard cap guarantees it always exits.
+ *
+ * • Only shown when JS runs (html.js) and reduced motion is NOT requested.
+ * • Runs from an inline script — independent of the main JS bundle.
+ * • Safety net: if the motion script never starts, `motion-fail` reveals all content.
+ */
+import LogoArt from './LogoArt.astro';
+
+// Dial geometry: 13 ticks from -150° to +150° (0° = 12 o'clock), radius 70 around (100,100)
+const CX = 100, CY = 100, R = 70;
+const ticks = Array.from({ length: 13 }, (_, i) => -150 + i * 25);
+const pt = (deg: number, r: number) => {
+  const a = (deg * Math.PI) / 180;
+  return { x: +(CX + r * Math.sin(a)).toFixed(2), y: +(CY - r * Math.cos(a)).toFixed(2) };
+};
+const a0 = pt(-150, R), a1 = pt(150, R);
+const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
+---
+<div class="loader" data-loader aria-hidden="true">
+  <div class="loader__panel loader__panel--top"></div>
+  <div class="loader__panel loader__panel--bottom"></div>
+
+  <div class="loader__stage">
+    <div class="loader__dial-wrap">
+      <span class="loader__glow"></span>
+      <svg class="loader__dial" viewBox="0 0 200 200" focusable="false">
+        <!-- sketchbook construction circles -->
+        <g class="loader__construct">
+          <circle cx="100" cy="100" r="94" />
+          <circle cx="100" cy="100" r="86" />
+        </g>
+        <path class="loader__track" d={arc} pathLength="100" />
+        <path class="loader__arc" d={arc} pathLength="100" data-loader-arc />
+        {ticks.map((deg, i) => {
+          const o = pt(deg, R + 12), n = pt(deg, i % 3 === 0 ? R + 2 : R + 6);
+          return <line class:list={['loader__tick', { 'loader__tick--major': i % 3 === 0 }]} x1={o.x} y1={o.y} x2={n.x} y2={n.y} data-tick={deg} />;
+        })}
+        <g class="loader__needle" data-loader-needle>
+          <line x1="100" y1="100" x2="100" y2="38" />
+          <circle cx="100" cy="38" r="3.2" />
+        </g>
+      </svg>
+      <span class="loader__pulse" data-loader-pulse></span>
+      <span class="loader__logo">
+        <LogoArt logo="logo.icon" size="50px" priority decorative />
+      </span>
+    </div>
+
+    <p class="loader__words">
+      <span data-word="0">Train</span>
+      <i aria-hidden="true">·</i>
+      <span data-word="1">Eat</span>
+      <i aria-hidden="true">·</i>
+      <span data-word="2">Thrive</span>
+    </p>
+
+    <p class="loader__meter">
+      <span class="loader__label" data-loader-label>Loading</span>
+      <span class="loader__bar"><span data-loader-bar></span></span>
+      <span class="loader__count"><span data-loader-count>000</span>%</span>
+    </p>
+  </div>
+
+  <p class="loader__skip">Click or press any key to skip</p>
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var L = document.querySelector('[data-loader]');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var released = false;
+
+    function release() {               // hand over to the page (hero entrance starts)
+      if (released) return;
+      released = true;
+      root.dataset.ready = '1';
+      document.dispatchEvent(new CustomEvent('gg:ready'));
+    }
+
+    // Safety net: if the motion script never confirms it started, show all content.
+    setTimeout(function () { if (root.dataset.motion !== 'on') root.classList.add('motion-fail'); }, 6000);
+
+    if (reduced || !L) { if (L) L.remove(); release(); return; }
+
+    var repeat = false;
+    try { repeat = sessionStorage.getItem('gg-intro') === '1'; sessionStorage.setItem('gg-intro', '1'); } catch (e) {}
+
+    var DELAY = repeat ? 200 : 700;     // let the dial draw in first
+    var SWEEP = repeat ? 1400 : 3000;   // needle travel time at full readiness
+    var CAP = 6500;                     // absolute maximum before the exit starts
+    var start = performance.now();
+    var ready = false, finishing = false, pct = 0;
+
+    var arcEl = L.querySelector('[data-loader-arc]');
+    var needle = L.querySelector('[data-loader-needle]');
+    var count = L.querySelector('[data-loader-count]');
+    var bar = L.querySelector('[data-loader-bar]');
+    var label = L.querySelector('[data-loader-label]');
+    var pulse = L.querySelector('[data-loader-pulse]');
+    var ticks = [].slice.call(L.querySelectorAll('[data-tick]'));
+    var words = [].slice.call(L.querySelectorAll('[data-word]'));
+
+    if (repeat) L.classList.add('is-repeat');
+
+    function ease(t) { return -(Math.cos(Math.PI * t) - 1) / 2; }   // easeInOutSine
+
+    function paint(p) {
+      var deg = -150 + 300 * (p / 100);
+      needle.setAttribute('transform', 'rotate(' + deg.toFixed(2) + ' 100 100)');
+      arcEl.style.strokeDashoffset = (100 - p).toFixed(2);
+      bar.style.transform = 'scaleX(' + (p / 100).toFixed(3) + ')';
+      count.textContent = ('00' + Math.round(p)).slice(-3);
+      for (var i = 0; i < ticks.length; i++) ticks[i].classList.toggle('is-on', +ticks[i].dataset.tick <= deg + 0.5);
+      for (var w = 0; w < words.length; w++) words[w].classList.toggle('is-on', p >= [12, 50, 88][w]);
+    }
+
+    function finish(fast) {
+      if (finishing) return;
+      finishing = true;
+      paint(100);
+      label.textContent = 'Ready';
+      L.classList.add('is-complete');
+      pulse.classList.add('is-firing');
+      setTimeout(function () {
+        L.classList.add('is-leaving');
+        release();
+        setTimeout(function () { L.remove(); }, 1250);
+      }, fast ? 60 : repeat ? 400 : 900);
+    }
+
+    function frame(now) {
+      if (finishing) return;
+      var t = Math.max(0, Math.min(1, (now - start - DELAY) / SWEEP));
+      var target = ease(t) * 100;
+      if (!ready) target = Math.min(target, 92);      // never claim 100% before the page is ready
+      pct += (target - pct) * 0.18;                     // smooth follow
+      if (target - pct < 0.15) pct = target;
+      paint(pct);
+      if (ready && t >= 1 && pct >= 99.9) return finish();
+      if (now - start > CAP) return finish(true);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    var domReady = new Promise(function (res) {
+      if (document.readyState !== 'loading') res();
+      else document.addEventListener('DOMContentLoaded', res, { once: true });
+    });
+    Promise.all([domReady, fontsReady]).then(function () { ready = true; }, function () { ready = true; });
+
+    // Skip: click / tap / any key fast-forwards to the exit
+    function skip() { ready = true; finish(true); }
+    L.addEventListener('pointerdown', skip, { once: true });
+    window.addEventListener('keydown', function onKey() { if (!finishing) skip(); window.removeEventListener('keydown', onKey); });
+  })();
+</script>
+
+<style>
+  .loader { display: none; }
+  :global(html.js) .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    color: #f3f1ed;
+  }
+  @media (prefers-reduced-motion: reduce) { :global(html.js) .loader { display: none; } }
+
+  /* ---------- Split panels (exit curtain) ---------- */
+  .loader__panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50.5%;
+    background-color: #121517;
+    background-image:
+      linear-gradient(rgb(134 201 138 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(134 201 138 / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    transition: transform 1150ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .loader__panel--top { top: 0; background-position: center bottom; }
+  .loader__panel--bottom { bottom: 0; background-position: center top; }
+  .loader__panel--top::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #86c98a, transparent);
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+  .loader.is-complete .loader__panel--top::after { opacity: 0.9; }
+  .loader.is-leaving .loader__panel--top { transform: translateY(-100%); }
+  .loader.is-leaving .loader__panel--bottom { transform: translateY(100%); }
+
+  /* ---------- Stage ---------- */
+  .loader__stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 1.6rem;
+    transition: opacity 600ms ease, transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .loader.is-leaving .loader__stage { opacity: 0; transform: scale(0.92); }
+
+  .loader__dial-wrap {
+    position: relative;
+    width: min(250px, 62vw);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+  .loader__glow {
+    position: absolute;
+    inset: 12%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(46 125 50 / 0.55), transparent 68%);
+    filter: blur(18px);
+    opacity: 0;
+    animation: gg-glow 2.4s ease-in-out 0.3s infinite alternate;
+  }
+  .loader__dial { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  .loader__construct circle {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.14);
+    stroke-width: 0.6;
+    stroke-dasharray: 2 4;
+  }
+  .loader__construct {
+    transform-origin: 100px 100px;
+    animation: gg-fade 600ms ease both, gg-spin 24s linear infinite;
+  }
+  .loader__construct circle:last-child { stroke-dasharray: 1 6; }
+
+  .loader__track { fill: none; stroke: rgb(255 255 255 / 0.1); stroke-width: 3; stroke-linecap: round; }
+  .loader__arc {
+    fill: none;
+    stroke: #86c98a;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 4px rgb(134 201 138 / 0.6));
+  }
+  .loader__tick {
+    stroke: rgb(255 255 255 / 0.28);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke 250ms ease;
+    animation: gg-fade 500ms ease both;
+  }
+  .loader__tick--major { stroke-width: 2.8; }
+  .loader__tick.is-on { stroke: #86c98a; }
+
+  .loader__needle line { stroke: #f3f1ed; stroke-width: 2.4; stroke-linecap: round; }
+  .loader__needle circle { fill: #86c98a; }
+  .loader__needle { animation: gg-fade 400ms ease 300ms both; }
+
+  .loader__logo {
+    position: relative;
+    width: 46%;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 6px rgb(255 255 255 / 0.06), 0 18px 40px -12px rgb(0 0 0 / 0.7);
+    animation: gg-pop 900ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both;
+  }
+  .loader__logo :global(.logo-art) { width: 44%; }
+  .loader.is-complete .loader__logo { animation: gg-beat 700ms ease; }
+
+  .loader__pulse {
+    position: absolute;
+    inset: 27%;
+    border-radius: 50%;
+    border: 2px solid #86c98a;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader__pulse.is-firing { animation: gg-pulse 1100ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  /* ---------- Words ---------- */
+  .loader__words {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 1.2rem + 2vw, 2.4rem);
+    letter-spacing: 0.14em;
+    line-height: 1;
+  }
+  .loader__words span {
+    color: rgb(255 255 255 / 0.16);
+    transform: translateY(6px);
+    transition: color 650ms ease, transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1), text-shadow 650ms ease;
+  }
+  .loader__words span.is-on { color: #f3f1ed; transform: none; }
+  .loader__words span[data-word='1'].is-on { color: #86c98a; text-shadow: 0 0 18px rgb(134 201 138 / 0.45); }
+  .loader__words i { font-style: normal; color: #86c98a; opacity: 0.6; }
+
+  /* ---------- Meter ---------- */
+  .loader__meter {
+    display: grid;
+    grid-template-columns: auto 160px auto;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.55);
+    animation: gg-fade 500ms ease 250ms both;
+  }
+  .loader__label { min-width: 6.5em; text-align: right; }
+  .loader.is-complete .loader__label { color: #86c98a; }
+  .loader__bar { position: relative; height: 2px; background: rgb(255 255 255 / 0.12); overflow: hidden; border-radius: 2px; }
+  .loader__bar span { position: absolute; inset: 0; background: #86c98a; transform-origin: left; transform: scaleX(0); }
+  .loader__count {
+    min-width: 4.2em;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: 0.06em;
+    color: #f3f1ed;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loader__skip {
+    position: absolute;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    z-index: 1;
+    margin: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.35);
+    animation: gg-fade 600ms ease 1.2s both;
+    transition: opacity 300ms ease;
+  }
+  /* override the fade-in animation's fill so the hint actually disappears */
+  .loader.is-complete .loader__skip,
+  .loader.is-leaving .loader__skip,
+  .loader.is-repeat .loader__skip { animation: none; opacity: 0; }
+
+  @media (max-width: 480px) {
+    .loader__meter { grid-template-columns: auto 110px auto; gap: 0.6rem; }
+    .loader__words { gap: 0.6rem; letter-spacing: 0.1em; }
+  }
+
+  @keyframes gg-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes gg-spin { to { transform: rotate(360deg); } }
+  @keyframes gg-glow { from { opacity: 0.35; transform: scale(0.92); } to { opacity: 0.9; transform: scale(1.06); } }
+  @keyframes gg-pop { from { opacity: 0; transform: scale(0.4) rotate(-20deg); } to { opacity: 1; transform: none; } }
+  @keyframes gg-beat { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  @keyframes gg-pulse { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.1); } }
+</style>

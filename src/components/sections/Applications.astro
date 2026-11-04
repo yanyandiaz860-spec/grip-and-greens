@@ -1,0 +1,103 @@
+---
+import SectionHead from '../SectionHead.astro';
+import ArtImage from '../ArtImage.astro';
+import MockupGallery from '../MockupGallery.astro';
+import Icon from '../Icon.astro';
+import type { MockupFolder } from '@/data/media';
+
+const groups: { id: MockupFolder; title: string; icon: 'sign' | 'envelope' | 'bag'; covers: string }[] = [
+  { id: 'signage', title: 'Signage', icon: 'sign', covers: 'Storefront, wayfinding and wall signs' },
+  { id: 'stationery', title: 'Stationery', icon: 'envelope', covers: 'Business cards, letterhead and envelopes' },
+  { id: 'packaging', title: 'Café Packaging', icon: 'bag', covers: 'Cups, bags, bowls and boxes' },
+];
+---
+<section id="applications" class="section surface-white apps" aria-labelledby="apps-title">
+  <div class="container container--wide">
+    <SectionHead num="11" label="Brand Applications" title="The brand <span class='accent'>in use</span>" id="apps-title">
+      <p class="lead">Where the identity meets real spaces and products: signage, stationery and café packaging.</p>
+    </SectionHead>
+
+    <!-- Original branding mockup (promo-04) -->
+    <div class="feature" data-reveal="scale">
+      <ArtImage art="application.mockup-01" group="applications" sizes="480px" />
+      <div class="feature__text">
+        <p class="feature__kicker">Original branding mockup</p>
+        <h3 class="feature__title">Logo wall with training gear</h3>
+        <p class="muted">The icon, wordmark and tagline placed on a concrete wall above a training mat.</p>
+      </div>
+    </div>
+
+    <div class="groups" data-stagger="130">
+      {groups.map((g, i) => (
+        <article class="group" id={`app-${g.id}`} aria-labelledby={`app-${g.id}-title`}>
+          <header class="group__head">
+            <span class="group__icon"><Icon name={g.icon} size={22} /></span>
+            <div>
+              <h3 class="group__title" id={`app-${g.id}-title`}>{g.title}</h3>
+              <p class="group__covers">{g.covers}</p>
+            </div>
+          </header>
+          <p class="group__label">Realistic mockups</p>
+          <MockupGallery folder={g.id} label={g.title} offset={i * 1400} />
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .feature {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: center;
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    background: var(--c-paper);
+    border-radius: var(--radius-lg);
+  }
+  @media (min-width: 768px) { .feature { grid-template-columns: minmax(0, 480px) 1fr; } }
+  .feature__kicker {
+    margin: 0 0 0.4rem;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--c-green);
+  }
+  .feature__title {
+    margin-bottom: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h3);
+    line-height: 1;
+  }
+
+  .groups { display: grid; gap: clamp(2.5rem, 4vw, 3.5rem) var(--space-5); margin-top: clamp(3rem, 5vw, 4.5rem); }
+  @media (min-width: 768px) { .groups { grid-template-columns: repeat(3, 1fr); } }
+  .group { padding-top: var(--space-5); border-top: 1px solid var(--line); }
+  .group__head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: var(--space-5); }
+  .group__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--c-green-50);
+    color: var(--c-green);
+    flex: none;
+  }
+  .group__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h3);
+    line-height: 1;
+  }
+  .group__covers { margin: 0.2rem 0 0; font-size: var(--fs-sm); color: var(--t-muted); }
+  .group__label {
+    margin: 0 0 0.6rem;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c-brown);
+  }
+</style>

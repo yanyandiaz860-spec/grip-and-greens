@@ -1,0 +1,119 @@
+---
+import SectionHead from '../SectionHead.astro';
+import MediaSlot from '../MediaSlot.astro';
+import Icon from '../Icon.astro';
+import { plans } from '@/data/plans';
+import { peso } from '@/data/menu';
+---
+<section id="membership" class="section surface-white membership" aria-labelledby="membership-title">
+  <div class="container container--wide">
+    <div class="membership__top">
+      <SectionHead num="06" label="Memberships" title="Pick the plan <span class='accent'>that fits</span>" id="membership-title">
+        <p class="lead">
+          Four packages from our business concept — from a single day on the floor to full training and
+          nutrition support.
+        </p>
+        <p class="membership__badge"><span class="badge badge--outline">Membership Plans</span></p>
+      </SectionHead>
+      <div class="membership__banner" data-reveal="scale">
+        <MediaSlot slot="memberships.banner" tone="light" sizes="(min-width: 1024px) 45vw, 100vw" />
+      </div>
+    </div>
+
+    <ul class="plans" data-stagger="110">
+      {plans.map((p) => (
+        <li class:list={['plan', `plan--${p.id}`, { 'theme-dark': p.id === 'elite' }]}>
+          <h3 class="plan__name">{p.name}</h3>
+          <p class="plan__access">{p.access}</p>
+          <p class="plan__price">
+            <span class="plan__amount">{peso(p.price)}</span>
+            <span class="plan__period">/ {p.period}</span>
+          </p>
+          <ul class="checklist plan__list" aria-label={`${p.name} privileges`}>
+            {p.privileges.map((x) => <li><Icon name="check" />{x}</li>)}
+          </ul>
+          <a class:list={['btn', 'plan__cta', { 'btn--ghost': p.id !== 'elite' }]} href="#contact" data-plan={p.id}>
+            Inquire about this plan<span class="sr-only">: {p.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="membership__foot">
+      Plan privileges follow our Business Concept Development paper. Grip &amp; Greens is a proposed
+      concept, so enrollment is not available on this site.
+    </p>
+  </div>
+</section>
+
+<style>
+  .membership__top {
+    display: grid;
+    gap: var(--space-6);
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  }
+  @media (min-width: 1024px) { .membership__top { grid-template-columns: 1fr 1fr; gap: var(--space-7); } }
+  .membership__top :global(.section-head) { margin-bottom: 0; }
+  .membership__badge { margin-top: var(--space-5); }
+
+  .plans {
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1180px) { .plans { grid-template-columns: repeat(4, 1fr); } }
+
+  .plan {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.4rem, 2.5vw, 1.9rem);
+    background: var(--c-paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+  .plan:hover { translate: 0 -6px; box-shadow: var(--shadow-lg); }
+  .plan--premium { background: var(--c-green-50); border-color: rgb(46 125 50 / 0.35); }
+  .plan.theme-dark { background: var(--c-night); border-color: var(--c-night); }
+
+  .plan__name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.9rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .plan__access { margin-top: 0.4rem; font-size: var(--fs-sm); color: var(--t-muted); min-height: 2.6em; }
+  .plan__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-top: var(--space-5);
+  }
+  .plan__amount {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 2.5rem + 1.5vw, 3.75rem);
+    line-height: 0.9;
+    color: var(--t-strong);
+  }
+  .plan__period { font-weight: 700; color: var(--t-muted); }
+  .plan__list {
+    margin: var(--space-5) 0 var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    flex: 1;
+    align-content: start;
+  }
+  .plan__list :global(li) { color: var(--t-strong); }
+  .plan__cta { width: 100%; }
+
+  .membership__foot {
+    max-width: 75ch;
+    margin-top: var(--space-6);
+    font-size: var(--fs-xs);
+    color: var(--t-muted);
+  }
+</style>

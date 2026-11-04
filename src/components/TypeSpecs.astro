@@ -1,0 +1,52 @@
+---
+import type { TypeSpec } from '@/data/brand';
+interface Props {
+  title?: string;
+  specs: TypeSpec[];
+  note?: string;
+}
+const { title = 'Typography', specs, note = 'Typefaces identified visually from the artwork — estimates, shown in the closest matching font.' } = Astro.props;
+---
+<div class="type">
+  <h3 class="spec-title">{title}</h3>
+  <ul class="type__list" data-stagger="100">
+    {specs.map((t) => (
+      <li class="type__item">
+        <p
+          class="type__sample"
+          style={`font-family:${t.css};font-weight:${t.weight ?? 400};letter-spacing:${t.tracking ?? 'normal'};${t.upper ? 'text-transform:uppercase;' : ''}--scale:${t.scale ?? 1}`}
+        >
+          {t.sample}
+        </p>
+        <div class="type__meta">
+          <p class="type__family">{t.family}</p>
+          <p class="type__usage">{t.usage}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+  {note && <p class="spec-note">{note}</p>}
+</div>
+
+<style>
+  .type__list { list-style: none; display: grid; gap: 0.75rem; }
+  .type__item {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--c-white);
+  }
+  :global(.theme-dark) .type__item { background: var(--c-night-2); }
+  .type__sample {
+    margin: 0;
+    font-size: calc(clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem) * var(--scale, 1));
+    line-height: 1.1;
+    color: var(--t-strong);
+    overflow-wrap: anywhere;
+  }
+  .type__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
+  .type__family { margin: 0; font-weight: 800; font-size: var(--fs-sm); color: var(--t-strong); }
+  .type__usage { margin: 0; font-size: 0.8125rem; color: var(--t-muted); }
+</style>

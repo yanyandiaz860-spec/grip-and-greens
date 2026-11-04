@@ -1,0 +1,84 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Chapter from '@/components/Chapter.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Story from '@/components/sections/Story.astro';
+import Mission from '@/components/sections/Mission.astro';
+import Audience from '@/components/sections/Audience.astro';
+import Gym from '@/components/sections/Gym.astro';
+import Cafe from '@/components/sections/Cafe.astro';
+import Membership from '@/components/sections/Membership.astro';
+import Owners from '@/components/sections/Owners.astro';
+import LogoDesign from '@/components/sections/LogoDesign.astro';
+import BrandPost from '@/components/sections/BrandPost.astro';
+import Posters from '@/components/sections/Posters.astro';
+import Applications from '@/components/sections/Applications.astro';
+import Contact from '@/components/sections/Contact.astro';
+
+const partOne = [
+  { num: '01', label: 'Our Story', href: '#story' },
+  { num: '02', label: 'Mission & Vision', href: '#mission' },
+  { num: '03', label: "Who It's For", href: '#why' },
+  { num: '04', label: 'The Gym', href: '#gym' },
+  { num: '05', label: 'The Café', href: '#cafe' },
+  { num: '06', label: 'Memberships', href: '#membership' },
+  { num: '07', label: 'The Owners', href: '#owners' },
+];
+const partTwo = [
+  { num: '08', label: 'Logo Design', href: '#logo' },
+  { num: '09', label: 'First Ever Brand Post', href: '#brand-post' },
+  { num: '10', label: 'Promotional Event Poster', href: '#posters' },
+  { num: '11', label: 'Brand Applications', href: '#applications' },
+];
+---
+<BaseLayout
+  title="Grip & Greens — Train. Eat. Thrive. | Brand Portfolio"
+  description="Grip & Greens is a gym and healthy café concept under one roof. Explore the business concept, logo design process, first brand post and promotional posters."
+>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+  <main id="main" tabindex="-1">
+    <Hero />
+
+    <Chapter title="Business Concept" items={partOne} />
+    <Story />
+    <Mission />
+    <Audience />
+    <Gym />
+    <Cafe />
+    <Membership />
+    <Owners />
+
+    <Chapter title="Brand Portfolio" items={partTwo} tone="green" />
+    <LogoDesign />
+    <BrandPost />
+    <Posters />
+    <Applications />
+
+    <Contact />
+    <p class="sr-only" aria-live="polite" data-copy-status></p>
+  </main>
+  <Footer />
+  <Lightbox />
+</BaseLayout>
+
+<script>
+  import { initNav } from '../scripts/nav';
+  import { initMotion } from '../scripts/motion';
+  import { initTabs } from '../scripts/tabs';
+  import { initLightbox } from '../scripts/lightbox';
+  import { initCarousels } from '../scripts/carousel';
+  import { initSlideshows } from '../scripts/slideshow';
+  import { initForm, initCopy } from '../scripts/form';
+  initNav();
+  initMotion();
+  initTabs();
+  initLightbox();
+  initCarousels();
+  initSlideshows();
+  initForm();
+  initCopy();
+</script>
