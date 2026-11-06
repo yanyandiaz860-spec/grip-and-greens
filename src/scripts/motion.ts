@@ -6,9 +6,7 @@
  *   data-reveal="up | left | right | scale | fade | clip"   animate the element itself
  *   data-stagger                                            animate direct children in sequence
  *
- * • Elements animate when they enter the viewport, scrolling DOWN or UP.
- * • When an element fully leaves the viewport it is reset, remembering whether it
- *   left above or below, so a re-entry slides in from the correct side.
+ * • Elements animate once, the first time they enter the viewport, then stay visible.
  * • Reduced motion: everything is shown immediately, no movement.
  * • Starts after the loader finishes (event `gg:ready`), so the hero entrance is seen.
  */
@@ -41,14 +39,9 @@ export function initMotion(): void {
     const io = new IntersectionObserver(
       (entries) => {
         for (const en of entries) {
-          const el = en.target as HTMLElement;
-          if (en.isIntersecting) {
-            el.classList.add('is-visible');
-          } else if (el.classList.contains('is-visible')) {
-            // fully out of view → reset, and remember which side it left from
-            el.dataset.from = en.boundingClientRect.top < 0 ? 'above' : 'below';
-            el.classList.remove('is-visible');
-          }
+          if (!en.isIntersecting) continue;
+          en.target.classList.add('is-visible');
+          io.unobserve(en.target);
         }
       },
       { threshold: 0, rootMargin: '0px 0px -6% 0px' },

@@ -15,6 +15,8 @@ const symbols = [
   { name: 'Leaf', meaning: 'Nutrition, freshness and healthy living.' },
   { name: 'Lowercase g', meaning: 'Strength, movement and balance.' },
 ];
+
+const railSteps = [...processKeys.map((k) => art[k].title.replace(/^0\d · /, '')), 'Final logo'];
 ---
 <section id="logo" class="section surface-white logo-sec" aria-labelledby="logo-title">
   <div class="container container--wide">
@@ -24,10 +26,53 @@ const symbols = [
         nutrition working together.
       </p>
     </SectionHead>
+  </div>
 
+  <!-- Logo process 01 → 04, ending on the final logo. Pinned on large screens (html.fx). -->
+  <div class="story" data-scene>
+    <div class="story__stage" data-scene-stage>
+      <div class="container container--wide story__grid">
+        <div class="story__intro">
+          <div class="sub-head">
+            <h3>Logo process</h3>
+            <p>Four concept sheets, in order. Select a sheet to view it larger.</p>
+          </div>
+          <ol class="rail" data-rail aria-hidden="true">
+            {railSteps.map((title, i) => (
+              <li class="rail__item"><span class="rail__num">0{i + 1}</span>{title}</li>
+            ))}
+          </ol>
+        </div>
+        <ol class="process" data-stagger="130">
+          {processKeys.map((k, i) => (
+            <li class="process__item" data-step>
+              <div class="process__sheet">
+                <ArtImage art={k} group="logo-process" sizes="(min-width: 1180px) 900px, (min-width: 768px) 46vw, 92vw" />
+                <p class="process__cap">
+                  <span class="process__num">0{i + 1}</span>
+                  {art[k].title.replace(/^0\d · /, '')}
+                </p>
+              </div>
+            </li>
+          ))}
+          <!-- Only on large screens, where it replaces the primary artboard below -->
+          <li class="process__item process__item--final" data-step>
+            <figure class="artboard artboard--primary marks">
+              <div class="artboard__art artboard__art--primary">
+                <LogoArt logo="logo.primary" size="min(620px, 80vw)" />
+              </div>
+              <figcaption><span>Primary logo</span> Horizontal lockup</figcaption>
+            </figure>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="container container--wide">
     <!-- Final logos (original files) -->
     <div class="logos" data-stagger="scale">
-      <figure class="artboard artboard--primary marks">
+      <figure class="artboard artboard--primary artboard--static marks">
         <div class="artboard__art artboard__art--primary">
           <LogoArt logo="logo.primary" size="min(620px, 80vw)" />
         </div>
@@ -46,30 +91,28 @@ const symbols = [
         <figcaption><span>Icon-only logo</span> App, favicon &amp; small spaces</figcaption>
       </figure>
     </div>
+  </div>
 
-    <ul class="symbols" data-stagger="120" aria-label="What the symbol means">
-      {symbols.map((s) => (
-        <li><p class="symbols__name">{s.name}</p><p class="symbols__meaning">{s.meaning}</p></li>
-      ))}
-    </ul>
-
-    <!-- Logo process 01 → 04 -->
-    <div class="sub-head">
-      <h3>Logo process</h3>
-      <p>Four concept sheets, in order. Select a sheet to view it larger.</p>
+  <!-- What the mark means. Pinned on large screens: the camera moves over the original logo. -->
+  <div class="meanings" data-scene>
+    <div class="meanings__stage" data-scene-stage>
+      <div class="container container--wide meanings__grid">
+        <div class="meanings__mark" aria-hidden="true">
+          <LogoArt logo="logo.icon" size="min(800px, 60vw)" decorative />
+        </div>
+        <div>
+          <p class="meanings__kicker">One mark, three meanings</p>
+          <ul class="symbols" data-stagger="120" aria-label="What the symbol means">
+            {symbols.map((s) => (
+              <li data-step><p class="symbols__name">{s.name}</p><p class="symbols__meaning">{s.meaning}</p></li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
-    <ol class="process" data-stagger="130">
-      {processKeys.map((k, i) => (
-        <li class="process__item">
-          <ArtImage art={k} group="logo-process" sizes="(min-width: 1180px) 600px, (min-width: 768px) 46vw, 92vw" />
-          <p class="process__cap">
-            <span class="process__num">0{i + 1}</span>
-            {art[k].title.replace(/^0\d · /, '')}
-          </p>
-        </li>
-      ))}
-    </ol>
+  </div>
 
+  <div class="container container--wide">
     <!-- Palette + typography -->
     <div class="specs">
       <Palette title="Logo color palette" swatches={logoPalette} cols={3} />
@@ -168,4 +211,186 @@ const symbols = [
     border-top: 1px solid var(--line);
   }
   @media (min-width: 1024px) { .specs { grid-template-columns: 1.3fr 1fr; } }
+
+  /* Static layout (phones, reduced motion, no JS) */
+  .story .sub-head { margin-top: 0; }
+  .rail,
+  .process__item--final,
+  .meanings__mark,
+  .meanings__kicker { display: none; }
+  .logos { margin-top: clamp(3rem, 5vw, 4.5rem); }
+
+  /* ---------- Pinned logo story (html.fx) ---------- */
+  :global(html.fx) .story { height: calc(100svh - var(--header-h) + 5 * 65svh); }
+  :global(html.fx) .story__stage {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+    overflow: hidden;
+  }
+  :global(html.fx) .story__grid {
+    display: grid;
+    grid-template-columns: minmax(250px, 1fr) minmax(0, 2.4fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+    height: 100%;
+    padding-block: clamp(1.25rem, 3svh, 2.5rem);
+  }
+  :global(html.fx) .story .sub-head { display: block; margin: 0 0 var(--space-6); }
+  :global(html.fx) .story .sub-head p { margin-top: 0.6rem; }
+
+  :global(html.fx) .rail {
+    display: grid;
+    gap: 0.15rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .rail__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    align-items: baseline;
+    padding: 0.55rem 0 0.55rem 1rem;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--t-muted);
+    opacity: 0.55;
+    transition: opacity 350ms var(--ease), color 350ms var(--ease);
+  }
+  .rail__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--c-green);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 450ms var(--ease-out);
+  }
+  .rail__num { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; line-height: 1; color: var(--c-green); }
+  .rail__item.is-past { opacity: 0.8; }
+  .rail__item.is-active { opacity: 1; color: var(--c-ink); }
+  .rail__item.is-past::before,
+  .rail__item.is-active::before { transform: none; }
+
+  :global(html.fx) .process {
+    position: relative;
+    display: block;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    container-type: size;
+  }
+  :global(html.fx) .process__item {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateY(70%) rotate(5deg);
+    pointer-events: none;
+    transition: opacity 450ms var(--ease-out), transform 850ms var(--ease-out);
+  }
+  /* Sheets settle onto a pile, like pages on a desk */
+  :global(html.fx) .process__item.is-past {
+    opacity: 0.22;
+    transform: scale(0.93) rotate(-2deg);
+  }
+  :global(html.fx) .process__item:nth-child(even).is-past { transform: scale(0.93) rotate(1.5deg); }
+  :global(html.fx) .process__item.is-active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    z-index: 1;
+  }
+  :global(html.fx) .process__sheet { width: min(100cqw, calc(100cqh * 4 / 3)); }
+  :global(html.fx) .process__cap { display: none; }
+
+  :global(html.fx) .process__item--final { display: grid; }
+  :global(html.fx) .process__item--final .artboard { width: min(100cqw, 860px); }
+  :global(html.fx) .logos .artboard--static { display: none; }
+
+  /* ---------- Pinned logo meanings (html.fx) ---------- */
+  .meanings { margin-top: var(--space-6); }
+  :global(html.fx) .meanings {
+    height: calc(100svh - var(--header-h) + 3 * 70svh);
+    margin-top: clamp(3.5rem, 6vw, 5rem);
+  }
+  :global(html.fx) .meanings__stage {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+    overflow: hidden;
+    background: var(--c-night);
+  }
+  :global(html.fx) .meanings__grid {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: center;
+    height: 100%;
+  }
+  :global(html.fx) .meanings__mark {
+    display: grid;
+    place-items: center;
+    width: min(66svh, 42vw);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 8px rgb(255 255 255 / 0.06), 0 0 0 9px rgb(134 201 138 / 0.35);
+  }
+  /* The original file is only moved and scaled, never altered */
+  .meanings__mark :global(.logo-art) {
+    width: 42%;
+    transition: transform 1100ms var(--ease-out);
+  }
+  .meanings[data-active-step='0'] .meanings__mark :global(.logo-art) { transform: scale(3.8) translate(17%, 36%); }
+  .meanings[data-active-step='1'] .meanings__mark :global(.logo-art) { transform: scale(3.6) translate(-11%, 19%); }
+
+  :global(html.fx) .meanings__kicker {
+    display: block;
+    margin: 0 0 var(--space-5);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--c-green-300);
+  }
+  :global(html.fx) .symbols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.5rem, 2svh, 1.25rem);
+    margin: 0;
+  }
+  :global(html.fx) .symbols li {
+    padding: 0;
+    border: 0;
+    opacity: 0.26;
+    transform: none;
+    transition: opacity 500ms var(--ease-out);
+  }
+  :global(html.fx) .symbols li.is-past { opacity: 0.42; }
+  :global(html.fx) .symbols li.is-active { opacity: 1; }
+  :global(html.fx) .symbols__name {
+    font-size: clamp(3rem, 1rem + 5vw, 6.5rem);
+    line-height: 0.95;
+    color: var(--t-on-dark);
+    transition: color 500ms var(--ease-out);
+  }
+  :global(html.fx) .symbols li.is-active .symbols__name { color: var(--c-green-300); }
+  :global(html.fx) .symbols__meaning {
+    display: grid;
+    grid-template-rows: 0fr;
+    max-height: 0;
+    overflow: hidden;
+    font-size: var(--fs-md);
+    color: var(--t-on-dark);
+    transition: max-height 500ms var(--ease-out), margin 500ms var(--ease-out);
+  }
+  :global(html.fx) .symbols li.is-active .symbols__meaning { max-height: 4em; margin-top: 0.5rem; }
 </style>

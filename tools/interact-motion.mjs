@@ -34,8 +34,7 @@ await p.waitForTimeout(1200);
 r.ownersAfterScrollDown = await vis('#owners .owners__list');
 await p.evaluate(() => window.scrollTo(0, document.querySelector('#contact').offsetTop));
 await p.waitForTimeout(600);
-r.ownersAfterLeaving = await vis('#owners .owners__list');
-r.ownersLeftFrom = await p.$eval('#owners .owners__list', (el) => el.dataset.from);
+r.ownersAfterLeaving = await vis('#owners .owners__list'); // reveals play once, so this stays true
 await p.evaluate(() => window.scrollTo(0, document.querySelector('#owners').offsetTop - 80));
 await p.waitForTimeout(1200);
 r.ownersAfterScrollUp = await vis('#owners .owners__list');

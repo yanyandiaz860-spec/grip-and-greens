@@ -90,3 +90,8 @@
   --focus: 0 0 0 3px var(--c-paper), 0 0 0 5px var(--c-green);
   --focus-dark: 0 0 0 3px var(--c-night), 0 0 0 5px var(--c-green-300);
 }
+
+/* Phones: tighter label tracking so long labels fit on one line */
+@media (max-width: 480px) {
+  :root { --track-label: 0.12em; }
+}

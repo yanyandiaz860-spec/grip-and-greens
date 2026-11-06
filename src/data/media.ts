@@ -14,7 +14,7 @@
  *              If no file exists, a labeled placeholder is rendered instead.
  *
  * 3) `mockupGallery()` — the team's signage, stationery and packaging mockups,
- *              which feed the slideshows in Brand Applications.
+ *              which feed the walkthrough in Brand Applications.
  *
  * See ASSET_MAP.md for the full slot list.
  */
@@ -254,8 +254,8 @@ export const SLOT_COUNT = Object.keys(slots).length; // 22
 
 /* ============================================================
    BRAND APPLICATION MOCKUPS (team-supplied, shown unchanged)
-   Every image in src/media/<signage|stationery|packaging>/ joins that card's
-   slideshow and gallery automatically. Add a matching entry below to give it
+   Every image in src/media/<signage|stationery|packaging>/ joins the
+   walkthrough and gallery automatically. Add a matching entry below to give it
    its own title and details; otherwise the title comes from the file name.
    ============================================================ */
 export type MockupFolder = 'signage' | 'stationery' | 'packaging';

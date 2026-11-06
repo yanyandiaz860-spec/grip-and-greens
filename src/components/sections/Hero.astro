@@ -10,14 +10,26 @@ const facts = [
   { value: String(plans.length), label: 'Membership options' },
   { value: audience.ageRange, label: 'Ages we serve' },
 ];
+
+/* Split into words so each one can rise out of its own mask */
+const headline = ['A', 'gym', 'and', 'a', 'healthy', 'café,'];
+const payoff = ['under', 'one', 'roof.'];
 ---
 <section id="home" class="hero surface-paper grid-paper" aria-labelledby="hero-title">
   <div class="container container--wide hero__grid">
     <div class="hero__copy" data-stagger="110">
-      <p class="eyebrow eyebrow--start">Gym + Healthy Café · Brand Portfolio</p>
+      <p class="eyebrow eyebrow--start hero__eyebrow">Gym + Healthy Café · Brand Portfolio</p>
 
       <h1 id="hero-title" class="hero__title display">
-        <span class="sr-only">Grip &amp; Greens — </span>A gym and a healthy café, <span class="accent">under one roof.</span>
+        <span class="sr-only">Grip &amp; Greens — </span>
+        {headline.map((w, i) => (
+          <><span class="word"><span class="word__in" style={`--w:${i}`}>{w}</span></span>{' '}</>
+        ))}
+        <span class="accent">
+          {payoff.map((w, i) => (
+            <><span class="word"><span class="word__in word__in--payoff" style={`--w:${headline.length + i}`}>{w}</span></span>{' '}</>
+          ))}
+        </span>
       </h1>
       <p class="lead hero__lead">
         Grip &amp; Greens brings training, goal-based meals and nutrition guidance together — so you never
@@ -56,6 +68,10 @@ const facts = [
 </section>
 
 <style>
+  /* Narrow phones: drop the lead rule so the label stays on one line */
+  @media (max-width: 410px) {
+    .hero__eyebrow::before { display: none; }
+  }
   .hero {
     position: relative;
     padding-block: clamp(2rem, 1.5rem + 2.5vw, 3.75rem) clamp(2.5rem, 4vw, 4rem);
@@ -85,6 +101,28 @@ const facts = [
     font-size: clamp(3rem, 1.6rem + 4.6vw, 6rem);
     max-width: 14ch;
   }
+  /* Headline: words rise out of a mask, the green payoff lands last.
+     The padding keeps the É accent and the comma inside the mask. */
+  .word {
+    display: inline-block;
+    overflow: clip;
+    padding: 0.18em 0.03em 0.1em;
+    margin: -0.18em -0.03em -0.1em;
+  }
+  .word__in { display: inline-block; }
+  :global(html.js) .word__in {
+    transform: translateY(125%);
+    transition: transform 950ms var(--ease-out) calc(var(--w) * 70ms + 120ms);
+  }
+  :global(html.js) .word__in--payoff {
+    transition-delay: calc(var(--w) * 70ms + 380ms);
+  }
+  :global(html.js) .hero__copy.is-visible .word__in,
+  :global(html.js.motion-fail) .word__in { transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .word__in { transform: none; transition: none; }
+  }
+
   .hero__lead { max-width: 46ch; margin-top: var(--space-5); }
   .hero__actions {
     display: flex;

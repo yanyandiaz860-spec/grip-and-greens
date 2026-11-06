@@ -17,6 +17,7 @@ import BrandPost from '@/components/sections/BrandPost.astro';
 import Posters from '@/components/sections/Posters.astro';
 import Applications from '@/components/sections/Applications.astro';
 import Contact from '@/components/sections/Contact.astro';
+import TextStrip from '@/components/TextStrip.astro';
 
 const partOne = [
   { num: '01', label: 'Our Story', href: '#story' },
@@ -52,11 +53,13 @@ const partTwo = [
     <Membership />
     <Owners />
 
+    <TextStrip />
     <Chapter title="Brand Portfolio" items={partTwo} tone="green" />
     <LogoDesign />
     <BrandPost />
     <Posters />
     <Applications />
+    <TextStrip reverse />
 
     <Contact />
     <p class="sr-only" aria-live="polite" data-copy-status></p>
@@ -71,14 +74,14 @@ const partTwo = [
   import { initTabs } from '../scripts/tabs';
   import { initLightbox } from '../scripts/lightbox';
   import { initCarousels } from '../scripts/carousel';
-  import { initSlideshows } from '../scripts/slideshow';
+  import { initScrollFx } from '../scripts/scrollfx';
   import { initForm, initCopy } from '../scripts/form';
+  initScrollFx();
   initNav();
   initMotion();
   initTabs();
   initLightbox();
   initCarousels();
-  initSlideshows();
   initForm();
   initCopy();
 </script>

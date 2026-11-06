@@ -1,0 +1,57 @@
+---
+/**
+ * TextStrip — the tagline as a large looping band. It speeds up with scrolling
+ * (scripts/scrollfx.ts) and sits still for reduced motion or no JS. Decorative:
+ * the tagline is already part of the page content.
+ */
+interface Props {
+  reverse?: boolean;
+}
+const { reverse = false } = Astro.props;
+const repeats = Array.from({ length: 3 });
+---
+<div class="strip" data-strip={reverse ? 'reverse' : 'forward'} aria-hidden="true">
+  <div class="strip__track" data-strip-track>
+    {[0, 1].map((g) => (
+      <div class="strip__group" data-strip-group={g === 0 ? '' : undefined}>
+        {repeats.map(() => (
+          <>
+            <span class="strip__word">Train</span>
+            <svg class="strip__star" viewBox="0 0 24 24" focusable="false"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z" /></svg>
+            <span class="strip__word strip__word--green">Eat</span>
+            <svg class="strip__star" viewBox="0 0 24 24" focusable="false"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z" /></svg>
+            <span class="strip__word strip__word--outline">Thrive</span>
+            <svg class="strip__star" viewBox="0 0 24 24" focusable="false"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z" /></svg>
+          </>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .strip {
+    overflow: hidden;
+    padding-block: clamp(0.75rem, 1.5vw, 1.5rem);
+    background: var(--c-night);
+    color: var(--t-on-dark);
+  }
+  .strip__track { display: flex; width: max-content; will-change: transform; }
+  .strip__group { display: flex; align-items: center; flex: none; }
+  .strip__word {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 2rem + 8vw, 9.5rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .strip__word--green { color: var(--c-green-300); }
+  .strip__word--outline { color: transparent; -webkit-text-stroke: 1.5px var(--t-on-dark); }
+  .strip__star {
+    flex: none;
+    width: clamp(1.25rem, 3vw, 2.75rem);
+    margin-inline: clamp(1rem, 3vw, 2.75rem);
+    fill: var(--c-green-300);
+  }
+</style>

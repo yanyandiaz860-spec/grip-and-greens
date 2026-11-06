@@ -1,6 +1,7 @@
 ---
 import LogoArt from './LogoArt.astro';
 import Icon from './Icon.astro';
+import ScrollDial from './ScrollDial.astro';
 import { navGroups, contactLink } from '@/data/nav';
 ---
 <header class="site-header" data-header>
@@ -8,6 +9,8 @@ import { navGroups, contactLink } from '@/data/nav';
     <a class="site-header__brand" href="#home" aria-label="Grip & Greens — back to top">
       <LogoArt logo="logo.primary" size="128px" priority decorative />
     </a>
+
+    <ScrollDial />
 
     <button
       class="menu-toggle"
@@ -45,9 +48,8 @@ import { navGroups, contactLink } from '@/data/nav';
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgb(255 255 255 / 0.94);
-    backdrop-filter: saturate(1.4) blur(10px);
-    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    /* Solid on purpose: a backdrop-filter here would also trap the fixed mobile menu inside the header */
+    background: var(--c-white);
     border-bottom: 1px solid transparent;
     transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   }

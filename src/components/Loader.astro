@@ -8,7 +8,7 @@
  * ring fires and the screen splits open onto the page.
  *
  * Progress is tied to real readiness (DOM + web fonts): the needle never claims 100%
- * before the page is ready. Timing: ~4.5 s on the first visit of a session, ~2.5 s on
+ * before the page is ready. Timing: ~1.8 s on the first visit of a session, ~0.75 s on
  * repeat visits. Click / tap / any key skips. A hard cap guarantees it always exits.
  *
  * • Only shown when JS runs (html.js) and reduced motion is NOT requested.
@@ -97,9 +97,9 @@ const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
     var repeat = false;
     try { repeat = sessionStorage.getItem('gg-intro') === '1'; sessionStorage.setItem('gg-intro', '1'); } catch (e) {}
 
-    var DELAY = repeat ? 200 : 700;     // let the dial draw in first
-    var SWEEP = repeat ? 1400 : 3000;   // needle travel time at full readiness
-    var CAP = 6500;                     // absolute maximum before the exit starts
+    var DELAY = repeat ? 100 : 200;     // let the dial draw in first
+    var SWEEP = repeat ? 500 : 1200;    // needle travel time at full readiness
+    var CAP = 4000;                     // absolute maximum before the exit starts
     var start = performance.now();
     var ready = false, finishing = false, pct = 0;
 
@@ -136,8 +136,8 @@ const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
       setTimeout(function () {
         L.classList.add('is-leaving');
         release();
-        setTimeout(function () { L.remove(); }, 1250);
-      }, fast ? 60 : repeat ? 400 : 900);
+        setTimeout(function () { L.remove(); }, 950);
+      }, fast ? 60 : repeat ? 150 : 400);
     }
 
     function frame(now) {
@@ -192,7 +192,7 @@ const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
       linear-gradient(rgb(134 201 138 / 0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgb(134 201 138 / 0.05) 1px, transparent 1px);
     background-size: 32px 32px;
-    transition: transform 1150ms cubic-bezier(0.76, 0, 0.24, 1);
+    transition: transform 850ms cubic-bezier(0.76, 0, 0.24, 1);
   }
   .loader__panel--top { top: 0; background-position: center bottom; }
   .loader__panel--bottom { bottom: 0; background-position: center top; }
@@ -216,7 +216,7 @@ const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
     display: grid;
     justify-items: center;
     gap: 1.6rem;
-    transition: opacity 600ms ease, transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+    transition: opacity 450ms ease, transform 700ms cubic-bezier(0.76, 0, 0.24, 1);
   }
   .loader.is-leaving .loader__stage { opacity: 0; transform: scale(0.92); }
 
@@ -357,7 +357,7 @@ const arc = `M${a0.x} ${a0.y} A${R} ${R} 0 1 1 ${a1.x} ${a1.y}`;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: rgb(255 255 255 / 0.35);
-    animation: gg-fade 600ms ease 1.2s both;
+    animation: gg-fade 300ms ease 0.3s both;
     transition: opacity 300ms ease;
   }
   /* override the fade-in animation's fill so the hint actually disappears */
